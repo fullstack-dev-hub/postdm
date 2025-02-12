@@ -1,9 +1,6 @@
 package com.postdm.backend;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
 public class Member {
@@ -15,5 +12,6 @@ public class Member {
 
     private String password;
 
-    private String role;
+    @Enumerated(EnumType.STRING)
+    private MemberRole role;
 }

@@ -50,5 +50,9 @@ sonar {
 		property "sonar.projectKey", "fullstack-dev-hub-0106_postdm-backend"
 		property "sonar.organization", "fullstack-dev-hub-0106"
 		property "sonar.host.url", "https://sonarcloud.io"
+		property "sonar.sources", "src/main/java"
+		property "sonar.tests", "src/test/java"
+		property "sonar.java.binaries", "build/classes"
+		property "sonar.coverage.exclusions", "**/config/**, **/dto/**, **/entity/**"
 	}
 }

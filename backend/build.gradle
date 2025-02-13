@@ -39,3 +39,16 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+// SonarQube 설정
+plugins {
+	id "org.sonarqube" version "6.0.1.5171"
+}
+
+sonar {
+	properties {
+		property "sonar.projectKey", "fullstack-dev-hub-0106_postdm-backend"
+		property "sonar.organization", "fullstack-dev-hub-0106"
+		property "sonar.host.url", "https://sonarcloud.io"
+	}
+}

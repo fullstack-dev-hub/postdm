@@ -3,3 +3,11 @@ spring:
     name: backend
   profiles:
     active: dev
+  datasource: # H2 인메모리 DB 사용(GitHub Actions)
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop

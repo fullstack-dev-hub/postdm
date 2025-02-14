@@ -1,7 +1,9 @@
 package com.postdm.backend;
 
+import lombok.Data;
 import org.springframework.http.HttpStatus;
 
+@Data
 public class ResponseTemplate<T> {
     int status;
     String message;
@@ -12,5 +14,4 @@ public class ResponseTemplate<T> {
         this.message = message;
         this.data = data;
     }
-
 }

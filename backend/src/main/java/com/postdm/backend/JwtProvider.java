@@ -57,7 +57,8 @@ public class JwtProvider {
 
     public boolean validateToken(String token) {
         try {
-            Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token);
+            Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload();
+            return true;
         }
         catch (SecurityException | MalformedJwtException e) {
             log.error("Signature verification failed");
@@ -73,7 +74,6 @@ public class JwtProvider {
         }
         catch (IllegalArgumentException e) {
             log.error("JWT claims string is empty");
-            throw new JwtException("값이 존재하지 않는 토큰 입니다.");
         }
 
         return false;

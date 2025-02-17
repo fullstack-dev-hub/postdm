@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class TokenInfo {
+public class TokenInfo { // 토큰 전송을 위한 DTO
     private String grantType;
     private String accessToken;
     private String refreshToken;

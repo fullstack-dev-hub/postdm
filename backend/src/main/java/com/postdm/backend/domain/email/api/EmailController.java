@@ -1,6 +1,5 @@
 package com.postdm.backend.domain.email.api;
 
-import com.postdm.backend.domain.auth.application.AuthService;
 import com.postdm.backend.domain.email.application.EmailService;
 import com.postdm.backend.domain.email.domain.entity.CertificationEntity;
 import com.postdm.backend.domain.email.dto.EmailCertificationRequestDto;
@@ -15,12 +14,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/auth")
-public class EmailController {
+public class EmailController { // 이메일 관련 컨트롤러
 
     @Autowired
     private EmailService emailService;
 
-    @PostMapping("/email-certification")
+    @PostMapping("/email-certification") // 이메일 전송 요청 api
     public ResponseTemplate<CertificationEntity> emailCertification(@RequestBody @Valid EmailCertificationRequestDto emailCertificationRequestDto) {
         CertificationEntity certificationEntity = emailService.emailCertification(emailCertificationRequestDto);
 

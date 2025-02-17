@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class EmailProvider {
+public class EmailProvider { // 이메일 발송을 위한 Provider
 
     private final JavaMailSender mailSender;
 

@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class EmailCertificationRequestDto {
+public class EmailCertificationRequestDto { // 이메일 인증 데이터를 전송하기 위한 DTO
 
     @NotBlank
     private String username;

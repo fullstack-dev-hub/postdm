@@ -12,7 +12,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class CertificationEntity {
+public class CertificationEntity { // 인증 메일 엔티티
 
     @Id
     private String username;

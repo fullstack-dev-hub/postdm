@@ -16,7 +16,7 @@ import java.io.IOException;
 
 @Component
 @RequiredArgsConstructor
-public class JwtAuthenticationFilter extends OncePerRequestFilter {
+public class JwtAuthenticationFilter extends OncePerRequestFilter { // JWT 필터. 해당 필터를 통해 JWT가 유효한지 판단
 
     private final JwtProvider jwtProvider;
 
@@ -26,15 +26,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = resolveToken(request);
 
         if (token != null && jwtProvider.validateToken(token)) {
-            Authentication auth = jwtProvider.getAuthentication(token);
-            SecurityContextHolder.getContext().setAuthentication(auth);
+            Authentication auth = jwtProvider.getAuthentication(token); // 사용자 추출
+            SecurityContextHolder.getContext().setAuthentication(auth); // SecurityContextHolder에 사용자 등록
         }
         filterChain.doFilter(request, response);
     }
 
-    private String resolveToken(HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization");
-        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+    private String resolveToken(HttpServletRequest request) { // 헤더에서 토큰 추출
+        String bearerToken = request.getHeader("Authorization"); // 헤더의 Authorization에서 값을 가져옴.
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) { // Bearer를 제외한 토큰 값 가져오기
             return bearerToken.substring(7);
         }
         return null;

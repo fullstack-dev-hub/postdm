@@ -9,7 +9,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
-public class EmailService {
+public class EmailService { // 이메일 관련 서비스
 
     @Autowired
     private MemberRepository memberRepository;
@@ -23,7 +23,7 @@ public class EmailService {
     @Autowired
     private EmailProvider emailProvider;
 
-    public CertificationEntity emailCertification(EmailCertificationRequestDto emailCertificationRequestDto) {
+    public CertificationEntity emailCertification(EmailCertificationRequestDto emailCertificationRequestDto) { // 인증메일 전송 서비스
 
         String username = emailCertificationRequestDto.getUsername();
         String email = emailCertificationRequestDto.getEmail();

@@ -10,7 +10,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class SignUpRequestDto {
+public class SignUpRequestDto { // 회원가입 데이터 전송을 위한 DTO
 
     @NotBlank
     private String nickname;

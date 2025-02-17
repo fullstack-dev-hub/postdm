@@ -4,7 +4,7 @@ import lombok.Data;
 import org.springframework.http.HttpStatus;
 
 @Data
-public class ResponseTemplate<T> {
+public class ResponseTemplate<T> { // api 응답을 위한 템플릿
     int status;
     String message;
     T data;

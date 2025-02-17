@@ -2,11 +2,8 @@ package com.postdm.backend.domain.auth.application;
 
 import com.postdm.backend.domain.auth.dto.SignInRequestDto;
 import com.postdm.backend.domain.auth.dto.SignUpRequestDto;
-import com.postdm.backend.domain.email.application.CertificationNumber;
-import com.postdm.backend.domain.email.application.EmailProvider;
 import com.postdm.backend.domain.email.domain.entity.CertificationEntity;
 import com.postdm.backend.domain.email.domain.repository.CertificationRepository;
-import com.postdm.backend.domain.email.dto.EmailCertificationRequestDto;
 import com.postdm.backend.domain.member.domain.entity.Member;
 import com.postdm.backend.domain.member.domain.entity.MemberRole;
 import com.postdm.backend.domain.member.domain.repository.MemberRepository;
@@ -34,10 +31,6 @@ public class AuthService {
     @Autowired
     private JwtProvider jwtProvider;
 
-    @Autowired
-    private EmailProvider emailProvider;
-
-
     @Value("${jwt.expiredMS}")
     private int refreshedMS;
 
@@ -47,25 +40,6 @@ public class AuthService {
             throw new IllegalArgumentException("이미 사용중인 아이디 입니다.");
         }
         return username;
-    }
-
-    public CertificationEntity emailCertification(EmailCertificationRequestDto emailCertificationRequestDto) {
-
-        String username = emailCertificationRequestDto.getUsername();
-        String email = emailCertificationRequestDto.getEmail();
-
-        boolean existedEmail = memberRepository.existsByEmail(email);
-        if (existedEmail) {
-            throw new IllegalArgumentException("이미 사용중인 이메일 입니다.");
-        }
-
-        String certificationNumber = CertificationNumber.getCertificationNumber();
-
-        emailProvider.sendCertificationMail(email, certificationNumber);
-
-        CertificationEntity certificationEntity = new CertificationEntity(username, email, bCryptPasswordEncoder.encode(certificationNumber));
-
-        return certificationRepository.save(certificationEntity);
     }
 
     public Member signUp(SignUpRequestDto signUpRequestDto) {

@@ -1,6 +1,7 @@
 package com.postdm.backend;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -22,10 +23,27 @@ public class AuthService {
     @Autowired
     private EmailProvider emailProvider;
 
+
+    @Value("${jwt.expiredMS}")
+    private int refreshedMS;
+
+    public String idCheck(String username) {
+        boolean existedUsername = memberRepository.existsByUsername(username);
+        if(existedUsername) {
+            throw new IllegalArgumentException("이미 사용중인 아이디 입니다.");
+        }
+        return username;
+    }
+
     public CertificationEntity emailCertification(EmailCertificationRequestDto emailCertificationRequestDto) {
 
         String username = emailCertificationRequestDto.getUsername();
         String email = emailCertificationRequestDto.getEmail();
+
+        boolean existedEmail = memberRepository.existsByEmail(email);
+        if (existedEmail) {
+            throw new IllegalArgumentException("이미 사용중인 이메일 입니다.");
+        }
 
         String certificationNumber = CertificationNumber.getCertificationNumber();
 
@@ -37,16 +55,13 @@ public class AuthService {
     }
 
     public Member signUp(SignUpRequestDto signUpRequestDto) {
+        String nickname = signUpRequestDto.getNickname();
+
         String username = signUpRequestDto.getUsername();
+        boolean existedUsername = memberRepository.existsByUsername(username);
 
-        String email = signUpRequestDto.getEmail();
-        String certificationNumber = signUpRequestDto.getCertificationNumber();
-
-        CertificationEntity certificationEntity = certificationRepository.findByUsername(username);
-        boolean isMatched = certificationEntity.getEmail().equals(email) && bCryptPasswordEncoder.matches(certificationNumber, certificationEntity.getCertificationNumber());
-
-        if(!isMatched) {
-            throw new IllegalArgumentException("인증번호가 일치하지 않습니다.");
+        if (existedUsername) {
+            throw new IllegalArgumentException("이미 사용중인 아이디 입니다.");
         }
 
         String password = signUpRequestDto.getPassword();
@@ -59,10 +74,30 @@ public class AuthService {
         String encodedPassword = bCryptPasswordEncoder.encode(password);
         signUpRequestDto.setPassword(encodedPassword);
 
+        String email = signUpRequestDto.getEmail();
+        boolean existedEmail = memberRepository.existsByEmail(email);
+
+        if (existedEmail) {
+            throw new IllegalArgumentException("이미 사용중인 이메일 입니다.");
+        }
+
+        String certificationNumber = signUpRequestDto.getCertificationNumber();
+
+        CertificationEntity certificationEntity = certificationRepository.findByUsername(username);
+        boolean isMatched = certificationEntity.getEmail().equals(email) && bCryptPasswordEncoder.matches(certificationNumber, certificationEntity.getCertificationNumber());
+
+        if(!isMatched) {
+            throw new IllegalArgumentException("인증번호가 일치하지 않습니다.");
+        }
+
+        String phone = signUpRequestDto.getPhone();
+
         Member member = Member.builder()
+                .nickname(nickname)
                 .username(username)
-                .email(email)
                 .password(encodedPassword)
+                .email(email)
+                .phone(phone)
                 .role(MemberRole.MEMBER).build();
 
         memberRepository.save(member);

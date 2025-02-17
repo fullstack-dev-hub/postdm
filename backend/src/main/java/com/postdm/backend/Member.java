@@ -10,10 +10,13 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Member {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
+    private String nickname;
 
     private String username;
 
@@ -21,14 +24,9 @@ public class Member {
 
     private String email;
 
+    private String phone;
+
     @Enumerated(EnumType.STRING)
     private MemberRole role;
 
-    @Builder
-    public Member(String username, String password, String email, MemberRole role) {
-        this.username = username;
-        this.password = password;
-        this.email = email;
-        this.role = role;
-    }
 }

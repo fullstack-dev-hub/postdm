@@ -13,6 +13,9 @@ import lombok.Setter;
 public class SignUpRequestDto {
 
     @NotBlank
+    private String nickname;
+
+    @NotBlank
     private String username;
 
     @NotBlank
@@ -24,6 +27,9 @@ public class SignUpRequestDto {
     @NotBlank
     @Email
     private String email;
+
+    @NotBlank
+    private String phone;
 
     @NotBlank
     private String certificationNumber;

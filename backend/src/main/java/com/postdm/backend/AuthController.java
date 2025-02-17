@@ -15,6 +15,12 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
+    @PostMapping("/id-check")
+    public ResponseTemplate<String> idCheck(@RequestBody IdCheckRequestDto idCheckRequestDto) {
+        String username = authService.idCheck(idCheckRequestDto.getUsername());
+        return new ResponseTemplate<>(HttpStatus.OK, "사용할 수 있는 아이디 입니다.", username);
+    }
+
     @PostMapping("/email-certification")
     public ResponseTemplate<CertificationEntity> emailCertification(@RequestBody @Valid EmailCertificationRequestDto emailCertificationRequestDto) {
         CertificationEntity certificationEntity = authService.emailCertification(emailCertificationRequestDto);
@@ -28,4 +34,5 @@ public class AuthController {
 
         return new ResponseTemplate<>(HttpStatus.OK, "회원가입 성공", member);
     }
+
 }

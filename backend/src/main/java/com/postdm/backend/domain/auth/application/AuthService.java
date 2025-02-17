@@ -105,15 +105,14 @@ public class AuthService {
 
         String password = signInRequestDto.getPassword();
         String encodedPassword = member.getPassword();
+
         boolean isMatched = bCryptPasswordEncoder.matches(password, encodedPassword);
         if(!isMatched) {
             throw new IllegalArgumentException("아이디 또는 비밀번호가 잘못되었습니다.");
         }
 
-        String accessToken = jwtProvider.generateAccessToken(username);
         String refreshToken = jwtProvider.generateRefreshToken(username);
 
-        response.setHeader("Authorization", "Bearer " + accessToken);
         response.addCookie(createCookie("Refresh", refreshToken));
 
         TokenInfo token = jwtProvider.generateToken(username);

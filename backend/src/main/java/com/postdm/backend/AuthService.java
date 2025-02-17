@@ -1,5 +1,7 @@
 package com.postdm.backend;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -105,6 +107,41 @@ public class AuthService {
         certificationRepository.delete(certificationEntity);
 
         return member;
+    }
+
+    public String signIn(SignInRequestDto signInRequestDto, HttpServletResponse response) {
+        String username = signInRequestDto.getUsername();
+
+        Member member = memberRepository.findByUsername(username);
+        if(member == null) {
+            throw new IllegalArgumentException("아이디 또는 비밀번호가 잘못되었습니다.");
+        }
+
+        String password = signInRequestDto.getPassword();
+        String encodedPassword = member.getPassword();
+        boolean isMatched = bCryptPasswordEncoder.matches(password, encodedPassword);
+        if(!isMatched) {
+            throw new IllegalArgumentException("아이디 또는 비밀번호가 잘못되었습니다.");
+        }
+
+        String accessToken = jwtProvider.generateAccessToken(username);
+        String refreshToken = jwtProvider.generateRefreshToken(username);
+
+        response.setHeader("Authorization", "Bearer " + accessToken);
+        response.addCookie(createCookie("Refresh", refreshToken));
+
+        TokenInfo token = jwtProvider.generateToken(username);
+
+        return token.getAccessToken();
+    }
+
+    private Cookie createCookie(String name, String value) {
+        Cookie cookie = new Cookie(name, value);
+        cookie.setMaxAge(refreshedMS);
+        cookie.setSecure(true);
+        cookie.setHttpOnly(true);
+
+        return cookie;
     }
 
 }

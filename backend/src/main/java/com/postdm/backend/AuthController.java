@@ -1,5 +1,6 @@
 package com.postdm.backend;
 
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -35,4 +36,10 @@ public class AuthController {
         return new ResponseTemplate<>(HttpStatus.OK, "회원가입 성공", member);
     }
 
+    @PostMapping("/sign-in")
+    public ResponseTemplate<String> signIn(@RequestBody @Valid SignInRequestDto signInRequestDto, HttpServletResponse response) {
+        String token = authService.signIn(signInRequestDto, response);
+
+        return new ResponseTemplate<>(HttpStatus.OK, "로그인 성공", token);
+    }
 }

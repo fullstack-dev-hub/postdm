@@ -4,8 +4,6 @@ import com.postdm.backend.domain.auth.application.AuthService;
 import com.postdm.backend.domain.auth.dto.IdCheckRequestDto;
 import com.postdm.backend.domain.auth.dto.SignInRequestDto;
 import com.postdm.backend.domain.auth.dto.SignUpRequestDto;
-import com.postdm.backend.domain.email.domain.entity.CertificationEntity;
-import com.postdm.backend.domain.email.dto.EmailCertificationRequestDto;
 import com.postdm.backend.domain.member.domain.entity.Member;
 import com.postdm.backend.global.template.ResponseTemplate;
 import jakarta.servlet.http.HttpServletResponse;
@@ -28,13 +26,6 @@ public class AuthController {
     public ResponseTemplate<String> idCheck(@RequestBody IdCheckRequestDto idCheckRequestDto) {
         String username = authService.idCheck(idCheckRequestDto.getUsername());
         return new ResponseTemplate<>(HttpStatus.OK, "사용할 수 있는 아이디 입니다.", username);
-    }
-
-    @PostMapping("/email-certification")
-    public ResponseTemplate<CertificationEntity> emailCertification(@RequestBody @Valid EmailCertificationRequestDto emailCertificationRequestDto) {
-        CertificationEntity certificationEntity = authService.emailCertification(emailCertificationRequestDto);
-
-        return new ResponseTemplate<>(HttpStatus.OK, "이메일이 성공적으로 발송되었습니다.", certificationEntity);
     }
 
     @PostMapping("/sign-up")

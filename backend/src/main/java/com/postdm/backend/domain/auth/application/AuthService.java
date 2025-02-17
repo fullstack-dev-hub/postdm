@@ -1,5 +1,17 @@
-package com.postdm.backend;
+package com.postdm.backend.domain.auth.application;
 
+import com.postdm.backend.domain.auth.dto.SignInRequestDto;
+import com.postdm.backend.domain.auth.dto.SignUpRequestDto;
+import com.postdm.backend.domain.email.application.CertificationNumber;
+import com.postdm.backend.domain.email.application.EmailProvider;
+import com.postdm.backend.domain.email.domain.entity.CertificationEntity;
+import com.postdm.backend.domain.email.domain.repository.CertificationRepository;
+import com.postdm.backend.domain.email.dto.EmailCertificationRequestDto;
+import com.postdm.backend.domain.member.domain.entity.Member;
+import com.postdm.backend.domain.member.domain.entity.MemberRole;
+import com.postdm.backend.domain.member.domain.repository.MemberRepository;
+import com.postdm.backend.global.jwt.dto.TokenInfo;
+import com.postdm.backend.global.jwt.util.JwtProvider;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;

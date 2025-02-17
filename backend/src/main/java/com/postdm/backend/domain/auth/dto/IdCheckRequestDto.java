@@ -1,4 +1,4 @@
-package com.postdm.backend;
+package com.postdm.backend.domain.auth.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;

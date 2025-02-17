@@ -1,4 +1,4 @@
-package com.postdm.backend;
+package com.postdm.backend.domain.email.application;
 
 public class CertificationNumber {
 

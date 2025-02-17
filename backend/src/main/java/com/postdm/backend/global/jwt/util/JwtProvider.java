@@ -1,5 +1,6 @@
-package com.postdm.backend;
+package com.postdm.backend.global.jwt.util;
 
+import com.postdm.backend.global.jwt.dto.TokenInfo;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.SecurityException;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +12,6 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 

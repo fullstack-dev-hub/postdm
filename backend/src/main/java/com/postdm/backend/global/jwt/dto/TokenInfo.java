@@ -1,4 +1,4 @@
-package com.postdm.backend;
+package com.postdm.backend.global.jwt.dto;
 
 import lombok.AccessLevel;
 import lombok.Builder;

@@ -1,6 +1,7 @@
-package com.postdm.backend;
+package com.postdm.backend.global.jwt.filter;
 
 
+import com.postdm.backend.global.jwt.util.JwtProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

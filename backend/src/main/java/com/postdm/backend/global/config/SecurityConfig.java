@@ -1,5 +1,7 @@
-package com.postdm.backend;
+package com.postdm.backend.global.config;
 
+import com.postdm.backend.global.jwt.filter.JwtAuthenticationFilter;
+import com.postdm.backend.global.jwt.util.JwtProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -1,4 +1,4 @@
-package com.postdm.backend;
+package com.postdm.backend.domain.email.application;
 
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;

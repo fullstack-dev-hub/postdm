@@ -1,4 +1,4 @@
-package com.postdm.backend;
+package com.postdm.backend.domain.auth.dto;
 
 import lombok.Data;
 

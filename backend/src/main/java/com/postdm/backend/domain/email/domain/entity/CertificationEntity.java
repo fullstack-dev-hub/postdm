@@ -1,4 +1,4 @@
-package com.postdm.backend;
+package com.postdm.backend.domain.email.domain.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;

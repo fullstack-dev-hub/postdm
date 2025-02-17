@@ -1,4 +1,4 @@
-package com.postdm.backend;
+package com.postdm.backend.domain.member.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

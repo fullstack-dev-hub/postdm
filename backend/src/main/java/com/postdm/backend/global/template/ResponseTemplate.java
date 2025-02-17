@@ -1,4 +1,4 @@
-package com.postdm.backend;
+package com.postdm.backend.global.template;
 
 import lombok.Data;
 import org.springframework.http.HttpStatus;

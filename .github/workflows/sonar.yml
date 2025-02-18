@@ -40,6 +40,10 @@ jobs:
       - name: Grant execute permission for gradlew # 실행 권한
         run: chmod +x backend/gradlew
 
+      - name: Build project (Without Tests)
+        working-directory: backend
+        run: ./gradlew clean build -x test
+
       - name: Build and analyze (Backend)
         working-directory: backend
         env:

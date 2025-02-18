@@ -44,6 +44,4 @@ jobs:
         working-directory: backend
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_BACKEND }}
-          SPRING_PROFILES_ACTIVE: test  # SonarCloud에서 application-test.yml을 사용
         run: ./gradlew sonar --info
-

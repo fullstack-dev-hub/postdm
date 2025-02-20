@@ -1,10 +1,11 @@
 "use client";
 import { useState } from "react";
-
+import { useRouter } from "next/navigation";
 const LoginPage = () => {
   const [id, setId] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(false);
+  const router = useRouter();
 
   const handleLogin = () => {
     if (!id || !password) {
@@ -67,8 +68,18 @@ const LoginPage = () => {
       <div className="w-full flex justify-between mt-4 text-xs text-gray-700">
         <button className="underline">회원가입</button>
         <div className="flex gap-4">
-          <button className="underline">아이디 찾기</button>
-          <button className="underline">비밀번호 찾기</button>
+          <button
+            className="underline"
+            onClick={() => router.push("/find?tab=id")}
+          >
+            아이디 찾기
+          </button>
+          <button
+            className="underline"
+            onClick={() => router.push("/find?tab=password")}
+          >
+            비밀번호 찾기
+          </button>
         </div>
       </div>
     </div>

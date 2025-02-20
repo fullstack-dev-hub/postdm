@@ -9,15 +9,27 @@ const FindPage = () => {
   const tab = searchParams.get("tab") || "id";
 
   const [foundId, setFoundId] = useState<string | null>(null);
+  const [showVerification, setShowVerification] = useState(false);
+  const [isVerified, setIsVerified] = useState(false);
 
   const handleTabChange = (newTab: string) => {
     router.push(`/find?tab=${newTab}`);
     setFoundId(null);
+    setShowVerification(false);
+    setIsVerified(false);
   };
 
   const handleFindId = () => {
     // 추후 연동 필요
     setFoundId("ekdm*******");
+  };
+
+  const handleVerifyEmail = () => {
+    setShowVerification(true);
+  };
+
+  const handleConfirmVerification = () => {
+    setIsVerified(true);
   };
 
   return (
@@ -108,12 +120,42 @@ const FindPage = () => {
                 placeholder="이메일 주소 입력"
                 className="w-full border-b border-gray-600 outline-none py-2 text-lg"
               />
-              <button className="ml-2 font-bold px-4 py-2 bg-[#353395] text-white rounded-md text-sm whitespace-nowrap">
+              <button
+                className="ml-2 font-bold px-4 py-2 bg-[#353395] text-white rounded-md text-sm whitespace-nowrap"
+                onClick={handleVerifyEmail}
+              >
                 인증
               </button>
             </div>
+            {showVerification && (
+              <div className="mt-4">
+                <label className="block text-left text-lg font-medium text-gray-700">
+                  인증번호
+                </label>
+                <div className="w-full flex items-center">
+                  <input
+                    type="text"
+                    placeholder="인증번호 입력"
+                    className="w-full border-b border-gray-600 outline-none py-2 text-lg"
+                  />
+                  <button
+                    className="ml-2 font-bold px-4 py-2 bg-[#353395] text-white rounded-md text-sm whitespace-nowrap"
+                    onClick={handleConfirmVerification}
+                  >
+                    확인
+                  </button>
+                </div>
+              </div>
+            )}
 
-            <button className="w-full bg-[#353395] font-semibold text-white rounded-full py-2 text-lg mt-6">
+            <button
+              className={`w-full font-semibold rounded-full py-2 text-lg mt-6 ${
+                isVerified
+                  ? "bg-[#353395] text-white"
+                  : "bg-[#353395] text-white opacity-50 cursor-not-allowed"
+              }`}
+              disabled={!isVerified}
+            >
               비밀번호 재설정
             </button>
           </div>

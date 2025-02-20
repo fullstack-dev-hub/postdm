@@ -14,6 +14,10 @@ const FindPage = () => {
   const [isVerified, setIsVerified] = useState(false);
   const [verificationCode, setVerificationCode] = useState("");
   const [verificationError, setVerificationError] = useState(false);
+  const [showPasswordReset, setShowPasswordReset] = useState(false);
+
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const handleTabChange = (newTab: string) => {
     router.push(`/find?tab=${newTab}`);
@@ -22,6 +26,7 @@ const FindPage = () => {
     setIsVerified(false);
     setVerificationCode("");
     setVerificationError(false);
+    setShowPasswordReset(false);
   };
 
   const handleFindId = () => {
@@ -35,12 +40,17 @@ const FindPage = () => {
 
   const handleConfirmVerification = () => {
     if (verificationCode === "1234") {
+      // 추후 연동 필요, 우선 인증코드가 1234면 통과
       setIsVerified(true);
       setVerificationError(false);
     } else {
       setIsVerified(false);
       setVerificationError(true);
     }
+  };
+
+  const handlePasswordReset = () => {
+    setShowPasswordReset(true);
   };
 
   return (
@@ -111,6 +121,37 @@ const FindPage = () => {
               </button>
             </div>
           )
+        ) : showPasswordReset ? (
+          <div>
+            <label className="block text-left text-lg font-medium text-gray-700">
+              변경 비밀번호{" "}
+              <span className="text-sm text-gray-500">
+                *영문 + 숫자 + 특수문자 8자 이상
+              </span>
+            </label>
+            <input
+              type="password"
+              placeholder="새로 변경할 비밀번호를 입력해주세요"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              className="w-full border-b border-gray-600 outline-none py-2 text-lg mt-2"
+            />
+
+            <label className="block text-left text-lg font-medium text-gray-700 mt-6">
+              변경 비밀번호 재확인
+            </label>
+            <input
+              type="password"
+              placeholder="비밀번호를 재입력해주세요"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="w-full border-b border-gray-600 outline-none py-2 text-lg mt-2"
+            />
+
+            <button className="w-full bg-[#353395] font-semibold text-white rounded-full py-2 text-lg mt-6">
+              비밀번호 변경하기
+            </button>
+          </div>
         ) : (
           <div>
             <label className="block text-left text-lg font-medium text-gray-700">
@@ -181,6 +222,7 @@ const FindPage = () => {
                   : "bg-[#353395] text-white opacity-50 cursor-not-allowed"
               }`}
               disabled={!isVerified}
+              onClick={handlePasswordReset}
             >
               비밀번호 재설정
             </button>

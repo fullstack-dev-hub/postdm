@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
+import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/solid";
 
 const FindPage = () => {
   const router = useRouter();
@@ -11,12 +12,16 @@ const FindPage = () => {
   const [foundId, setFoundId] = useState<string | null>(null);
   const [showVerification, setShowVerification] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
+  const [verificationCode, setVerificationCode] = useState("");
+  const [verificationError, setVerificationError] = useState(false);
 
   const handleTabChange = (newTab: string) => {
     router.push(`/find?tab=${newTab}`);
     setFoundId(null);
     setShowVerification(false);
     setIsVerified(false);
+    setVerificationCode("");
+    setVerificationError(false);
   };
 
   const handleFindId = () => {
@@ -29,7 +34,13 @@ const FindPage = () => {
   };
 
   const handleConfirmVerification = () => {
-    setIsVerified(true);
+    if (verificationCode === "1234") {
+      setIsVerified(true);
+      setVerificationError(false);
+    } else {
+      setIsVerified(false);
+      setVerificationError(true);
+    }
   };
 
   return (
@@ -136,8 +147,18 @@ const FindPage = () => {
                   <input
                     type="text"
                     placeholder="인증번호 입력"
-                    className="w-full border-b border-gray-600 outline-none py-2 text-lg"
+                    value={verificationCode}
+                    onChange={(e) => setVerificationCode(e.target.value)}
+                    className={`flex-grow border-b outline-none py-2 text-lg ${
+                      verificationError ? "border-red-500" : "border-gray-600"
+                    }`}
                   />
+                  {isVerified && (
+                    <CheckCircleIcon className="w-6 h-6 text-green-500 flex-shrink-0 ml-2" />
+                  )}
+                  {verificationError && (
+                    <XCircleIcon className="w-6 h-6 text-red-500 flex-shrink-0 ml-2" />
+                  )}
                   <button
                     className="ml-2 font-bold px-4 py-2 bg-[#353395] text-white rounded-md text-sm whitespace-nowrap"
                     onClick={handleConfirmVerification}
@@ -145,6 +166,11 @@ const FindPage = () => {
                     확인
                   </button>
                 </div>
+                {verificationError && (
+                  <p className="text-red-500 font-semibold text-sm mt-1">
+                    * 인증번호를 다시 확인해주세요.
+                  </p>
+                )}
               </div>
             )}
 

@@ -23,7 +23,9 @@ const InputField = ({
     <div className="flex items-center space-x-2">
       <label className="text-lg font-medium text-gray-700">{label}</label>
       {helperText && (
-        <span className="text-sm text-gray-500">{helperText}</span>
+        <span className="text-sm text-gray-500 whitespace-nowrap">
+          {helperText}
+        </span>
       )}
     </div>
     <div className="w-full flex items-center">

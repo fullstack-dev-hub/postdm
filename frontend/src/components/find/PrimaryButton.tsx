@@ -1,10 +1,5 @@
 "use client";
-
-interface PrimaryButtonProps {
-  text: string;
-  onClick?: () => void;
-  disabled?: boolean;
-}
+import { PrimaryButtonProps } from "@/types/components";
 
 const PrimaryButton = ({
   text,

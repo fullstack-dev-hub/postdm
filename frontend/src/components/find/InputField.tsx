@@ -1,14 +1,6 @@
 "use client";
 
-interface InputFieldProps {
-  label: string;
-  type: string;
-  placeholder: string;
-  value?: string;
-  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  children?: React.ReactNode;
-  helperText?: string;
-}
+import { InputFieldProps } from "@/types/components";
 
 const InputField = ({
   label,

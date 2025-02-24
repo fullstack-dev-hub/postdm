@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/solid";
 import PrimaryButton from "@/components/find/PrimaryButton";
+import InputField from "@/components/find/InputField";
 
 const FindPage = () => {
   const router = useRouter();
@@ -104,72 +105,50 @@ const FindPage = () => {
             </div>
           ) : (
             <div>
-              <label className="block text-left text-lg font-medium text-gray-700">
-                이메일
-              </label>
-              <input
+              <InputField
+                label="이메일"
                 type="email"
                 placeholder="이메일 주소 입력"
-                className="w-full border-b border-gray-600 outline-none py-2 text-lg mt-2"
               />
               <PrimaryButton text="아이디 확인하기" onClick={handleFindId} />
             </div>
           )
         ) : showPasswordReset ? (
           <div>
-            <label className="block text-left text-lg font-medium text-gray-700">
-              변경 비밀번호{" "}
-              <span className="text-sm text-gray-500">
-                *영문 + 숫자 + 특수문자 8자 이상
-              </span>
-            </label>
-            <input
+            <InputField
+              label="변경 비밀번호"
               type="password"
               placeholder="새로 변경할 비밀번호를 입력해주세요"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
-              className="w-full border-b border-gray-600 outline-none py-2 text-lg mt-2"
+              helperText="*영문 + 숫자 + 특수문자 8자 이상"
             />
 
-            <label className="block text-left text-lg font-medium text-gray-700 mt-6">
-              변경 비밀번호 재확인
-            </label>
-            <input
+            <InputField
+              label="변경 비밀번호 재확인"
               type="password"
               placeholder="비밀번호를 재입력해주세요"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full border-b border-gray-600 outline-none py-2 text-lg mt-2"
             />
-
             <PrimaryButton text="비밀번호 변경하기" />
           </div>
         ) : (
           <div>
-            <label className="block text-left text-lg font-medium text-gray-700">
-              아이디
-            </label>
-            <input
-              type="text"
-              placeholder="아이디 입력"
-              className="w-full border-b border-gray-600 outline-none py-2 text-lg mt-2"
-            />
-
-            <label className="block text-left text-lg font-medium text-gray-700 mt-6">
-              이메일
-            </label>
+            <InputField label="아이디" type="text" placeholder="아이디 입력" />
             <div className="w-full flex items-center">
-              <input
+              <InputField
+                label="이메일"
                 type="email"
                 placeholder="이메일 주소 입력"
-                className="w-full border-b border-gray-600 outline-none py-2 text-lg"
-              />
-              <button
-                className="ml-2 font-bold px-4 py-2 bg-primary text-white rounded-md text-sm whitespace-nowrap"
-                onClick={handleVerifyEmail}
               >
-                인증
-              </button>
+                <button
+                  className="font-bold px-4 py-2 bg-primary text-white rounded-md text-sm whitespace-nowrap"
+                  onClick={handleVerifyEmail}
+                >
+                  인증
+                </button>
+              </InputField>
             </div>
             {showVerification && (
               <div className="mt-4">
@@ -206,7 +185,6 @@ const FindPage = () => {
                 )}
               </div>
             )}
-
             <PrimaryButton
               text="비밀번호 재설정"
               onClick={handlePasswordReset}

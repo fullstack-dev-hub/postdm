@@ -3,6 +3,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/solid";
+import PrimaryButton from "@/components/find/PrimaryButton";
 
 const FindPage = () => {
   const router = useRouter();
@@ -90,12 +91,10 @@ const FindPage = () => {
                 고객님과 일치하는 아이디입니다.
               </p>
               <p className="text-xl font-semibold mt-2"> ID : {foundId}</p>
-              <button
-                className="w-full bg-primary font-bold text-white rounded-full py-2 text-lg mt-6"
+              <PrimaryButton
+                text="로그인"
                 onClick={() => router.push("/login")}
-              >
-                로그인
-              </button>
+              />
               <button
                 className="w-full text-sm underline mt-4"
                 onClick={() => handleTabChange("password")}
@@ -113,12 +112,7 @@ const FindPage = () => {
                 placeholder="이메일 주소 입력"
                 className="w-full border-b border-gray-600 outline-none py-2 text-lg mt-2"
               />
-              <button
-                className="w-full bg-primary font-semibold text-white rounded-full py-2 text-lg mt-6"
-                onClick={handleFindId}
-              >
-                아이디 확인하기
-              </button>
+              <PrimaryButton text="아이디 확인하기" onClick={handleFindId} />
             </div>
           )
         ) : showPasswordReset ? (
@@ -148,9 +142,7 @@ const FindPage = () => {
               className="w-full border-b border-gray-600 outline-none py-2 text-lg mt-2"
             />
 
-            <button className="w-full bg-primary font-semibold text-white rounded-full py-2 text-lg mt-6">
-              비밀번호 변경하기
-            </button>
+            <PrimaryButton text="비밀번호 변경하기" />
           </div>
         ) : (
           <div>
@@ -215,17 +207,11 @@ const FindPage = () => {
               </div>
             )}
 
-            <button
-              className={`w-full font-semibold rounded-full py-2 text-lg mt-6 ${
-                isVerified
-                  ? "bg-primary text-white"
-                  : "bg-primary text-white opacity-50 cursor-not-allowed"
-              }`}
-              disabled={!isVerified}
+            <PrimaryButton
+              text="비밀번호 재설정"
               onClick={handlePasswordReset}
-            >
-              비밀번호 재설정
-            </button>
+              disabled={!isVerified}
+            />
           </div>
         )}
       </div>

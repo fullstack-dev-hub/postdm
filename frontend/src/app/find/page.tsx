@@ -64,7 +64,7 @@ const FindPage = () => {
           onClick={() => handleTabChange("id")}
           className={`w-1/2 py-3 text-center font-medium border-b-2 ${
             tab === "id"
-              ? "text-[#353395] border-[#353395] font-semibold"
+              ? "text-primary border-primary font-semibold"
               : "text-gray-400 border-gray-400"
           }`}
         >
@@ -74,7 +74,7 @@ const FindPage = () => {
           onClick={() => handleTabChange("password")}
           className={`w-1/2 py-3 text-center font-medium border-b-2 ${
             tab === "password"
-              ? "text-[#353395] border-[#353395] font-semibold"
+              ? "text-primary border-primary font-semibold"
               : "text-gray-400 border-gray-400"
           }`}
         >
@@ -86,12 +86,12 @@ const FindPage = () => {
         {tab === "id" ? (
           foundId ? (
             <div className="text-center">
-              <p className="text-[#353395] text-lg font-bold">
+              <p className="text-primary text-lg font-bold">
                 고객님과 일치하는 아이디입니다.
               </p>
               <p className="text-xl font-semibold mt-2"> ID : {foundId}</p>
               <button
-                className="w-full bg-[#353395] font-bold text-white rounded-full py-2 text-lg mt-6"
+                className="w-full bg-primary font-bold text-white rounded-full py-2 text-lg mt-6"
                 onClick={() => router.push("/login")}
               >
                 로그인
@@ -114,7 +114,7 @@ const FindPage = () => {
                 className="w-full border-b border-gray-600 outline-none py-2 text-lg mt-2"
               />
               <button
-                className="w-full bg-[#353395] font-semibold text-white rounded-full py-2 text-lg mt-6"
+                className="w-full bg-primary font-semibold text-white rounded-full py-2 text-lg mt-6"
                 onClick={handleFindId}
               >
                 아이디 확인하기
@@ -148,7 +148,7 @@ const FindPage = () => {
               className="w-full border-b border-gray-600 outline-none py-2 text-lg mt-2"
             />
 
-            <button className="w-full bg-[#353395] font-semibold text-white rounded-full py-2 text-lg mt-6">
+            <button className="w-full bg-primary font-semibold text-white rounded-full py-2 text-lg mt-6">
               비밀번호 변경하기
             </button>
           </div>
@@ -173,7 +173,7 @@ const FindPage = () => {
                 className="w-full border-b border-gray-600 outline-none py-2 text-lg"
               />
               <button
-                className="ml-2 font-bold px-4 py-2 bg-[#353395] text-white rounded-md text-sm whitespace-nowrap"
+                className="ml-2 font-bold px-4 py-2 bg-primary text-white rounded-md text-sm whitespace-nowrap"
                 onClick={handleVerifyEmail}
               >
                 인증
@@ -201,7 +201,7 @@ const FindPage = () => {
                     <XCircleIcon className="w-6 h-6 text-red-500 flex-shrink-0 ml-2" />
                   )}
                   <button
-                    className="ml-2 font-bold px-4 py-2 bg-[#353395] text-white rounded-md text-sm whitespace-nowrap"
+                    className="ml-2 font-bold px-4 py-2 bg-primary text-white rounded-md text-sm whitespace-nowrap"
                     onClick={handleConfirmVerification}
                   >
                     확인
@@ -218,8 +218,8 @@ const FindPage = () => {
             <button
               className={`w-full font-semibold rounded-full py-2 text-lg mt-6 ${
                 isVerified
-                  ? "bg-[#353395] text-white"
-                  : "bg-[#353395] text-white opacity-50 cursor-not-allowed"
+                  ? "bg-primary text-white"
+                  : "bg-primary text-white opacity-50 cursor-not-allowed"
               }`}
               disabled={!isVerified}
               onClick={handlePasswordReset}

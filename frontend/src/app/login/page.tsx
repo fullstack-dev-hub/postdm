@@ -59,7 +59,7 @@ const LoginPage = () => {
         </p>
       )}
       <button
-        className="w-full font-bold bg-[#353395] text-white rounded-full py-2 text-lg mt-10"
+        className="w-full font-bold bg-primary text-white rounded-full py-2 text-lg mt-10"
         onClick={handleLogin}
       >
         로그인

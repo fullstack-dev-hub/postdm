@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -14,6 +16,7 @@ import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 @Slf4j
 @Component
@@ -31,12 +34,13 @@ public class JwtProvider { // JWT 발급을 위한 Provider
         this.refreshedMs = refreshedMs;
     }
 
-    public String generateAccessToken(String username) { // AccessToken 생성
+    public String generateAccessToken(String username, String role) { // AccessToken 생성
         Date now = new Date();
         Date accessTokenExpiredAt = new Date(now.getTime() + expiredMs);
 
         return Jwts.builder()
                 .subject(username)
+                .claim("role", role)
                 .issuedAt(now)
                 .expiration(accessTokenExpiredAt)
                 .signWith(secretKey)
@@ -79,9 +83,9 @@ public class JwtProvider { // JWT 발급을 위한 Provider
         return false;
     }
 
-    public TokenInfo generateToken(String username) { // 토큰 생성
+    public TokenInfo generateToken(String username, String role) { // 토큰 생성
 
-        String accessToken = generateAccessToken(username);
+        String accessToken = generateAccessToken(username, role);
         String refreshToken = generateRefreshToken(username);
 
         return TokenInfo.builder()
@@ -95,7 +99,9 @@ public class JwtProvider { // JWT 발급을 위한 Provider
         Claims claims = Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload();
 
         String username = claims.getSubject();
+        String role = claims.get("role", String.class);  // role 추출
+        List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(role));
 
-        return new UsernamePasswordAuthenticationToken(username, "", Collections.emptyList());
+        return new UsernamePasswordAuthenticationToken(username, "", authorities);
     }
 }

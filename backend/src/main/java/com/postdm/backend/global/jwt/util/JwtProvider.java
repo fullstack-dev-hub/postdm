@@ -1,5 +1,7 @@
 package com.postdm.backend.global.jwt.util;
 
+import com.postdm.backend.domain.member.domain.entity.Member;
+import com.postdm.backend.domain.member.domain.repository.MemberRepository;
 import com.postdm.backend.global.jwt.dto.TokenInfo;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.SecurityException;
@@ -28,10 +30,13 @@ public class JwtProvider { // JWT 발급을 위한 Provider
 
     private final long refreshedMs;
 
-    public JwtProvider(@Value("${jwt.secret}")String secret, @Value("${jwt.expiredMS}") long expiredMs, @Value("${jwt.refreshedMs}") long refreshedMs) {
+    private final MemberRepository memberRepository;
+
+    public JwtProvider(@Value("${jwt.secret}")String secret, @Value("${jwt.expiredMS}") long expiredMs, @Value("${jwt.refreshedMs}") long refreshedMs, MemberRepository memberRepository) {
         secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
         this.expiredMs = expiredMs;
         this.refreshedMs = refreshedMs;
+        this.memberRepository = memberRepository;
     }
 
     public String generateAccessToken(String username, String role) { // AccessToken 생성
@@ -99,9 +104,17 @@ public class JwtProvider { // JWT 발급을 위한 Provider
         Claims claims = Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload();
 
         String username = claims.getSubject();
-        String role = claims.get("role", String.class);  // role 추출
-        List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(role));
 
-        return new UsernamePasswordAuthenticationToken(username, "", authorities);
+        String role = claims.get("role", String.class);  // role 추출
+
+        Member member = memberRepository.findByUsername(username);
+        if (member == null) {
+            throw new RuntimeException("해당 사용자 정보를 찾을 수 없습니다.");
+        }
+
+        List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role));
+
+        // Spring Security에서 Authentication 객체의 principal을 Member 객체로 저장
+        return new UsernamePasswordAuthenticationToken(member, "", authorities);
     }
 }

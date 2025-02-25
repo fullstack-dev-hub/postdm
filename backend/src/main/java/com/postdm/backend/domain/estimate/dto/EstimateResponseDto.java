@@ -12,7 +12,7 @@ public class EstimateResponseDto {
     @Schema(description = "견적서 ID", example = "1")
     private Long id;
 
-    @Schema(description = "견적서 제목 (내용 앞 10글자 + *** 자동 생성)", example = "이것은 견적서 ***")
+    @Schema(description = "견적서 제목 (내용 앞 10글자 + ... 자동 생성)", example = "이것은 견적서의 내...")
     private String title;
 
     @Schema(description = "견적서 내용", example = "이것은 견적서의 내용입니다.")

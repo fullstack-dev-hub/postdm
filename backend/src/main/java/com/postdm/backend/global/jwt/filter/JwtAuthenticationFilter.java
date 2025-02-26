@@ -31,9 +31,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter { // JWT 필�
             Authentication auth = jwtProvider.getAuthentication(token); // 사용자 추출
             SecurityContextHolder.getContext().setAuthentication(auth); // SecurityContextHolder에 사용자 등록
         }
-        else {
-            log.warn("[JwtAuthenticationFilter] Invalid or missing token.");
-        }
+
         filterChain.doFilter(request, response);
     }
 

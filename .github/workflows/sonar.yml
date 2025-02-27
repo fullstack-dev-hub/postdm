@@ -40,9 +40,14 @@ jobs:
       - name: Grant execute permission for gradlew # 실행 권한
         run: chmod +x backend/gradlew
 
-      - name: Build project (Without Tests)
+#      - name: Build project (Without Tests)
+#        working-directory: backend
+#        run: ./gradlew clean build -x test
+
+      # 테스트 실행 및 JaCoCo 리포트 생성
+      - name: Run Tests & Generate JaCoCo Coverage Report
         working-directory: backend
-        run: ./gradlew clean build -x test
+        run: ./gradlew clean test jacocoTestReport
 
       - name: Build and analyze (Backend)
         working-directory: backend

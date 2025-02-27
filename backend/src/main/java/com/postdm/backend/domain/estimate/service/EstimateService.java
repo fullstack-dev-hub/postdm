@@ -32,6 +32,10 @@ public class EstimateService {
     }
 
     public EstimateResponseDto createEstimate(String content, Member member) {
+        if (content == null || content.trim().isEmpty()) {
+            throw new IllegalArgumentException("견적서 내용은 비어 있을 수 없습니다.");
+        }
+
         if (member == null) {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication != null && authentication.getPrincipal() instanceof Member) {

@@ -2,16 +2,30 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Title from '@/components/Title';
 import Button from '@/components/Button';
 import EstimateList from '@/components/EstimateList';
 import Pagination from '@/components/Pagination';
 
+// 견적서 항목의 타입 정의
+interface EstimateItem {
+  id: number;
+  title: string;
+  date: string;
+}
+
 export default function EstimateListPage() {
-  // 예시 데이터 - 실제로는 API 호출 등으로 가져올 수 있습니다
-  const [estimates, setEstimates] = useState([]);
+  const router = useRouter();
+  // 명시적으로 타입 지정
+  const [estimates, setEstimates] = useState<EstimateItem[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6; // 페이지당 표시할 항목 수
+
+  // 견적서 작성 페이지로 이동하는 함수
+  const handleWriteClick = () => {
+    router.push('/estimate/write');
+  };
 
   // 실제 구현 시 API 호출 등으로 데이터를 가져옵니다
   useEffect(() => {
@@ -62,7 +76,7 @@ export default function EstimateListPage() {
       {/* 버튼 영역 - Title 아래에 고정 */}
       <div className="fixed top-[164px] w-full px-5 z-30 bg-white pb-4">
         <div className="flex justify-end">
-          <Button>견적서 작성하기</Button>
+          <Button onClick={handleWriteClick}>견적서 작성하기</Button>
         </div>
       </div>
       

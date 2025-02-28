@@ -37,7 +37,7 @@ const EstimateList = ({ items }: EstimateListProps) => {
         </div>
       ) : (
         estimates.map((estimate) => (
-          <Link href={`/estimate/${estimate.id}`} key={estimate.id}>
+          <Link href={`/estimate/view/${estimate.id}`} key={estimate.id}>
             <div className="relative cursor-pointer">
               <div className="flex justify-between items-center px-[30px]">
                 <span className="font-inter font-normal text-[15px] leading-[20px] text-black">

@@ -13,15 +13,23 @@ const Signup = () => {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
 
-  const [isUsernameAvailable, setIsUsernameAvailable] = useState(false);
+  const [isUsernameAvailable, setIsUsernameAvailable] = useState<
+    boolean | null
+  >(null);
   const [isPasswordValid, setIsPasswordValid] = useState(false);
   const [isPasswordMatch, setIsPasswordMatch] = useState(false);
   const [showVerificationField, setShowVerificationField] = useState(false);
-  const [isVerificationSuccess, setIsVerificationSuccess] = useState(false);
+  const [isEmailAvailable, setIsEmailAvailable] = useState<boolean | null>(
+    null
+  );
+  const [isVerificationSuccess, setIsVerificationSuccess] = useState<
+    boolean | null
+  >(null);
 
   const handleCheckUsername = () => {
     // 아이디 중복 확인 -> 추후 서버 연동
-    setIsUsernameAvailable(true);
+    // 예제: "testuser"는 이미 사용 중
+    setIsUsernameAvailable(username !== "testuser");
   };
 
   const validatePassword = (value: string) => {
@@ -39,6 +47,8 @@ const Signup = () => {
   const handleSendVerification = () => {
     // 이메일 인증 요청 -> 추후 서버 연동
     setShowVerificationField(true);
+    // 예제: "test@example.com"은 이미 사용 중
+    setIsEmailAvailable(email !== "test@example.com");
   };
 
   const handleVerifyCode = () => {
@@ -58,7 +68,9 @@ const Signup = () => {
         onChange={(e) => setUsername(e.target.value)}
         buttonText="중복 확인"
         onButtonClick={handleCheckUsername}
-        success={isUsernameAvailable}
+        success={isUsernameAvailable === true}
+        error={isUsernameAvailable === false}
+        errorText="* 사용 중인 아이디입니다."
       />
 
       <SignupInputField
@@ -68,6 +80,8 @@ const Signup = () => {
         value={password}
         onChange={(e) => validatePassword(e.target.value)}
         helperText="* 영문 + 숫자 + 특수문자 포함 8자 이상"
+        error={!isPasswordValid && password.length > 0}
+        errorText="* 영문 + 숫자 + 특수문자 8자 이상"
         success={isPasswordValid}
       />
 
@@ -78,6 +92,7 @@ const Signup = () => {
         value={confirmPassword}
         onChange={(e) => checkPasswordMatch(e.target.value)}
         error={confirmPassword.length > 0 && !isPasswordMatch}
+        errorText="* 비밀번호가 일치하지 않습니다."
         success={isPasswordMatch}
       />
 
@@ -89,6 +104,9 @@ const Signup = () => {
         onChange={(e) => setEmail(e.target.value)}
         buttonText="인증"
         onButtonClick={handleSendVerification}
+        success={isEmailAvailable === true}
+        error={isEmailAvailable === false}
+        errorText="* 이미 사용 중인 이메일입니다."
       />
 
       {showVerificationField && (
@@ -100,8 +118,9 @@ const Signup = () => {
           onChange={(e) => setVerificationCode(e.target.value)}
           buttonText="확인"
           onButtonClick={handleVerifyCode}
-          success={isVerificationSuccess}
-          error={verificationCode.length > 0 && !isVerificationSuccess}
+          success={isVerificationSuccess === true}
+          error={isVerificationSuccess === false}
+          errorText="* 인증번호를 다시 확인해주세요."
         />
       )}
 

@@ -74,12 +74,12 @@ const Header = () => {
         </button>
       </header>
 
-      {/* Navigation Overlay */}
+      {/* Navigation Overlay - 높은 z-index로 Title까지 가리도록 설정 */}
       {isNavOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-40" onClick={toggleNav}>
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-[60]" onClick={toggleNav}>
           {/* Navigation Menu */}
           <div 
-            className="absolute right-0 top-0 h-full w-3/5 max-w-[220px] bg-white z-50"
+            className="absolute right-0 top-0 h-full w-3/5 max-w-[220px] bg-white z-[70]"
             onClick={(e) => e.stopPropagation()} // Prevent clicks inside from closing
           >
             {/* Close button */}

@@ -36,7 +36,7 @@ const SignupInputField = ({
         )}
       </div>
 
-      <div className="w-full flex items-center border-b py-2 text-lg space-x-2">
+      <div className="w-full flex items-center border-b py-2 space-x-2">
         <input
           type={type}
           placeholder={placeholder}

@@ -110,7 +110,7 @@ const Header = () => {
                   </Link>
                 </li>
                 <li className="py-4">
-                  <Link href="/contact" className="block w-full text-sm font-medium">
+                  <Link href="/estimate/list" className="block w-full text-sm font-medium">
                     나의 견적서
                   </Link>
                 </li>

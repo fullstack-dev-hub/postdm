@@ -137,7 +137,7 @@ const Signup = () => {
         type="tel"
         placeholder="휴대폰 번호 입력"
         value={phone}
-        onChange={(e) => setPhone(e.target.value)}
+        onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
       />
 
       <PrimaryButton text="회원가입" onClick={() => alert("회원가입 완료")} />

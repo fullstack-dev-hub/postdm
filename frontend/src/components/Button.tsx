@@ -17,12 +17,16 @@ const Button = ({ width = 'w-[123px]', children, onClick }: ButtonProps) => {
         flex
         justify-center
         items-center
-        px-[18px]
+        px-[13px]
         py-2
         bg-[#353395]
         rounded-[31px]
         text-white
         gap-[10px]
+        font-inter
+        font-semibold
+        text-[13px]
+        leading-4
       `}
     >
       {children}

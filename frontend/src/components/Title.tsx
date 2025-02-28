@@ -7,7 +7,7 @@ interface TitleProps {
 
 const Title = ({ pageTitle }: TitleProps) => {
   return (
-    <div className="relative w-full h-[64px] mt-[100px]">
+    <div className="fixed top-[100px] left-0 right-0 h-[64px] bg-white z-40">
       {/* Back button */}
       <div className="absolute left-[22px] top-[14px] w-[42px] h-[40px]">
         <Image

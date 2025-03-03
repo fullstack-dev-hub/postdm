@@ -3,7 +3,8 @@ plugins {
 	id 'org.springframework.boot' version '3.4.2'
 	id 'io.spring.dependency-management' version '1.1.7'
 
-	id "org.sonarqube" version "6.0.1.5171"
+	//id "org.sonarqube" version "6.0.1.5171"
+	//id 'jacoco'
 }
 
 group = 'com.postdm'
@@ -52,21 +53,45 @@ dependencies {
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	testImplementation 'com.h2database:h2' //테스트 환경 h2 DB
+	testImplementation 'org.assertj:assertj-core:3.24.2' //테스트 검증을 위한 AssertJ 라이브러리
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
 }
 
-// SonarQube 설정
-sonar {
-	properties {
-		property "sonar.projectKey", "fullstack-dev-hub-0106_postdm-backend"
-		property "sonar.organization", "fullstack-dev-hub-0106"
-		property "sonar.host.url", "https://sonarcloud.io"
-		property "sonar.sources", "src/main/java"
-		property "sonar.tests", "src/test/java"
-		property "sonar.java.binaries", "build/classes"
-		property "sonar.coverage.exclusions", "**/config/**, **/dto/**, **/entity/**"
+
+// // SonarQube 설정
+//sonar {
+//	properties {
+//		property "sonar.projectKey", "fullstack-dev-hub-0106_postdm-backend"
+//		property "sonar.organization", "fullstack-dev-hub-0106"
+//		property "sonar.host.url", "https://sonarcloud.io"
+//		property "sonar.sources", "src/main/java"
+//		property "sonar.tests", "src/test/java"
+//		//property "sonar.java.binaries", "build/classes"
+//		property "sonar.coverage.jacoco.xmlReportPaths", layout.buildDirectory.file("reports/jacoco/test/jacocoTestReport.xml").get().asFile.absolutePath
+//		property "sonar.coverage.exclusions", "**/config/**, **/dto/**, **/entity/**"
+//	}
+//}
+
+/*
+// jacoco 설정
+jacoco {
+	toolVersion = "0.8.8"
+}
+
+test {
+	useJUnitPlatform()
+	finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+	dependsOn test
+	reports {
+		xml.required = true
+		html.required = true
+		csv.required = false
 	}
 }
+*/

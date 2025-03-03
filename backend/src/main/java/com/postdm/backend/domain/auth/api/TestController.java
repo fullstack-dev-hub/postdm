@@ -12,6 +12,8 @@ public class TestController { // 현재 사용자 세션 확인용 테스트 컨
     public ResponseTemplate<String> test() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        return new ResponseTemplate<>(HttpStatus.OK, "환영합니다, " + username + "님!", username);
+        String role = SecurityContextHolder.getContext().getAuthentication().getAuthorities().iterator().next().getAuthority();
+
+        return new ResponseTemplate<>(HttpStatus.OK, "환영합니다, " + role + ", " + username + "님!", username);
     }
 }

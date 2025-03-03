@@ -114,7 +114,9 @@ public class AuthService { // 로그인 및 회원가입 서비스
             throw new IllegalArgumentException("아이디 또는 비밀번호가 잘못되었습니다.");
         }
 
-        TokenInfo token = jwtProvider.generateToken(username); // 로그인이 완료되면 토큰 생성
+        String role = member.getRole().name();
+
+        TokenInfo token = jwtProvider.generateToken(username, role); // 로그인이 완료되면 토큰 생성
         String refreshToken = token.getRefreshToken();
 
         response.addCookie(createCookie("Refresh", refreshToken)); // 쿠키에 refresh 토큰 담음

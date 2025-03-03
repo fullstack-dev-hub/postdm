@@ -3,13 +3,16 @@
 import { useState } from "react";
 import { privacyPolicy } from "@/data/terms";
 
-const PrivacyAgreement = () => {
-  const [isPrivacyChecked, setIsPrivacyChecked] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+interface PrivacyAgreementProps {
+  isChecked: boolean;
+  setIsChecked: (checked: boolean) => void;
+}
 
-  const handlePrivacyCheck = () => {
-    setIsPrivacyChecked((prev) => !prev);
-  };
+const PrivacyAgreement = ({
+  isChecked,
+  setIsChecked,
+}: PrivacyAgreementProps) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const toggleModal = () => {
     setIsModalOpen((prev) => !prev);
@@ -21,8 +24,8 @@ const PrivacyAgreement = () => {
         <input
           type="checkbox"
           id="privacyCheck"
-          checked={isPrivacyChecked}
-          onChange={handlePrivacyCheck}
+          checked={isChecked}
+          onChange={() => setIsChecked(!isChecked)}
           className="w-5 h-5 text-primary border-gray-300 rounded cursor-pointer"
         />
         <label htmlFor="privacyCheck" className="ml-2 text-gray-700">

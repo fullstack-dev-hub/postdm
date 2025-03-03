@@ -26,6 +26,7 @@ const Signup = () => {
   const [isVerificationSuccess, setIsVerificationSuccess] = useState<
     boolean | null
   >(null);
+  const [isPrivacyChecked, setIsPrivacyChecked] = useState(false);
 
   const handleCheckUsername = () => {
     // 아이디 중복 확인 -> 추후 서버 연동
@@ -56,6 +57,19 @@ const Signup = () => {
     // 인증번호 확인 -> 추후 서버 연동
     setIsVerificationSuccess(verificationCode === "123456");
   };
+
+  const isSignupDisabled =
+    !username ||
+    !password ||
+    !confirmPassword ||
+    !email ||
+    !name ||
+    !phone ||
+    !isPrivacyChecked ||
+    isUsernameAvailable === false ||
+    isEmailAvailable === false ||
+    !isPasswordValid ||
+    !isPasswordMatch;
 
   return (
     <div className="max-w-md mx-auto p-6 mt-6">
@@ -141,9 +155,16 @@ const Signup = () => {
         onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
       />
 
-      <PrivacyAgreement />
+      <PrivacyAgreement
+        isChecked={isPrivacyChecked}
+        setIsChecked={setIsPrivacyChecked}
+      />
 
-      <PrimaryButton text="회원가입" onClick={() => alert("회원가입 완료")} />
+      <PrimaryButton
+        text="회원가입"
+        onClick={() => alert("회원가입 완료")}
+        disabled={isSignupDisabled}
+      />
     </div>
   );
 };

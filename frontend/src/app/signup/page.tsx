@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import SignupInputField from "@/components/signup/SignupInputField";
+import PrivacyAgreement from "@/components/signup/PrivacyAgreement";
 import PrimaryButton from "@/components/find/PrimaryButton";
 
 const Signup = () => {
@@ -57,7 +58,7 @@ const Signup = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto p-6">
+    <div className="max-w-md mx-auto p-6 mt-6">
       <h2 className="text-2xl font-bold text-center mb-6">회원가입</h2>
 
       <SignupInputField
@@ -139,6 +140,8 @@ const Signup = () => {
         value={phone}
         onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
       />
+
+      <PrivacyAgreement />
 
       <PrimaryButton text="회원가입" onClick={() => alert("회원가입 완료")} />
     </div>

@@ -4,6 +4,7 @@ import { useState } from "react";
 import SignupInputField from "@/components/signup/SignupInputField";
 import PrivacyAgreement from "@/components/signup/PrivacyAgreement";
 import PrimaryButton from "@/components/find/PrimaryButton";
+import Title from "@/components/Title";
 
 const Signup = () => {
   const [username, setUsername] = useState("");
@@ -72,8 +73,8 @@ const Signup = () => {
     !isPasswordMatch;
 
   return (
-    <div className="max-w-md mx-auto p-6 mt-6">
-      <h2 className="text-2xl font-bold text-center mb-6">회원가입</h2>
+    <div className="max-w-md mx-auto p-6 pt-[164px]">
+      <Title pageTitle="회원가입" />
 
       <SignupInputField
         label="아이디"

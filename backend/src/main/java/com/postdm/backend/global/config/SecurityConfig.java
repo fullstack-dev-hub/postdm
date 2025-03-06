@@ -40,6 +40,8 @@ public class SecurityConfig { // 시큐리티 설정을 위한 Config
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/auth/**").permitAll() // /api/v1/auth로 시작하는 경로는 모두 허용(회원가입, 로그인 등)
+                        .requestMatchers("/api/v1/email/**").permitAll()
+                        .requestMatchers("/api/v1/member/**").permitAll()
                         .requestMatchers("/api/v1/estimates/**").hasAnyRole("MEMBER", "ADMIN") // 견적서 API는 MEMBER와 ADMIN만 접근 가능
                         .anyRequest().authenticated() // 이외의 경로는 인증을 필요로함.
                 );

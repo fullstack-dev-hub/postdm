@@ -41,4 +41,15 @@ public class EmailService { // 이메일 관련 서비스
 
         return certificationRepository.save(certificationEntity);
     }
+
+    public CertificationEntity resetCertification(EmailCertificationRequestDto emailCertificationRequestDto) {
+        String username = emailCertificationRequestDto.getUsername();
+        String email = emailCertificationRequestDto.getEmail();
+
+        String certificationNumber = CertificationNumber.getCertificationNumber();
+        emailProvider.sendCertificationMail(email, certificationNumber);
+
+        CertificationEntity certificationEntity = new CertificationEntity(username, email, bCryptPasswordEncoder.encode(certificationNumber));
+        return certificationRepository.save(certificationEntity);
+    }
 }

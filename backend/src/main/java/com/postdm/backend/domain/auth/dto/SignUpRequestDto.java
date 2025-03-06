@@ -16,6 +16,7 @@ public class SignUpRequestDto { // 회원가입 데이터 전송을 위한 DTO
     private String nickname;
 
     @NotBlank
+    @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*\\d)[a-zA-Z\\d]{7,15}$") // 영문자, 숫자를 포함한 7글자 이상 15글자 이하
     private String username;
 
     @NotBlank

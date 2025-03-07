@@ -2,7 +2,6 @@ package com.postdm.backend.global.config;
 
 import com.postdm.backend.global.jwt.filter.JwtAuthenticationFilter;
 import com.postdm.backend.global.jwt.util.JwtProvider;
-import org.apache.catalina.filters.CorsFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,7 +15,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 
@@ -35,7 +34,7 @@ public class SecurityConfig { // 시큐리티 설정을 위한 Config
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource())); // CORS 설정 적용
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())); // 프론트엔드 로컬 테스트 CORS 설정 적용
         http
                 .csrf(AbstractHttpConfigurer::disable); // csrf 비활성화
 
@@ -70,15 +69,14 @@ public class SecurityConfig { // 시큐리티 설정을 위한 Config
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of("http://localhost:3000")); // 로컬 환경에서 CORS 허용
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
+        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowCredentials(true);
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration config = new CorsConfiguration();
-
-        config.setAllowedOrigins(List.of("http://localhost:3000")); // 허용할 프론트엔드 주소
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
-        config.setAllowedHeaders(List.of("*"));
-        config.setAllowCredentials(true);
-
-        source.registerCorsConfiguration("/**", config);
-        return (CorsConfigurationSource) source;
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 }

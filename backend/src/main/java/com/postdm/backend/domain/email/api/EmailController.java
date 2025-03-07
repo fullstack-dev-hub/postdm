@@ -4,6 +4,9 @@ import com.postdm.backend.domain.email.application.EmailService;
 import com.postdm.backend.domain.email.domain.entity.CertificationEntity;
 import com.postdm.backend.domain.email.dto.EmailCertificationRequestDto;
 import com.postdm.backend.global.template.ResponseTemplate;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,6 +22,10 @@ public class EmailController { // 이메일 관련 컨트롤러
     @Autowired
     private EmailService emailService;
 
+    @Operation(summary = "회원가입용 이메일 전송 컨트롤러")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공"),
+    })
     @PostMapping("/email-certification") // 이메일 전송 요청 api
     public ResponseTemplate<CertificationEntity> emailCertification(@RequestBody @Valid EmailCertificationRequestDto emailCertificationRequestDto) {
         CertificationEntity certificationEntity = emailService.emailCertification(emailCertificationRequestDto);
@@ -26,6 +33,10 @@ public class EmailController { // 이메일 관련 컨트롤러
         return new ResponseTemplate<>(HttpStatus.OK, "이메일이 성공적으로 발송되었습니다.", certificationEntity);
     }
 
+    @Operation(summary = "비밀번호 재설정용 이메일 전송 컨트롤러")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공"),
+    })
     @PostMapping("/reset-certification")
     public ResponseTemplate<CertificationEntity> resetCertification(@RequestBody @Valid EmailCertificationRequestDto emailCertificationRequestDto) {
         CertificationEntity certificationEntity = emailService.resetCertification(emailCertificationRequestDto);

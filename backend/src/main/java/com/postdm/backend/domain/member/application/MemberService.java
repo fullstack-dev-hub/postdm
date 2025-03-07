@@ -35,7 +35,7 @@ public class MemberService {
         return member;
     }
 
-    public String checkCertificationNumber(CheckCertificationRequestDto checkCertificationRequestDto) {
+    public boolean checkCertificationNumber(CheckCertificationRequestDto checkCertificationRequestDto) {
         String username  = checkCertificationRequestDto.getUsername();
         String email = checkCertificationRequestDto.getEmail();
         String certificationNumber = checkCertificationRequestDto.getCertificationNumber();
@@ -54,10 +54,10 @@ public class MemberService {
             throw new IllegalArgumentException();
         }
 
-        return "인증 성공";
+        return true;
     }
 
-    public String resetPassword(ResetPasswordRequestDto resetPasswordRequestDto) {
+    public Member resetPassword(ResetPasswordRequestDto resetPasswordRequestDto) {
         String username =  resetPasswordRequestDto.getUsername();
         String password = resetPasswordRequestDto.getPassword();
         String confirmPassword = resetPasswordRequestDto.getConfirmPassword();
@@ -79,6 +79,6 @@ public class MemberService {
         memberRepository.save(member);
         certificationRepository.delete(certificationEntity);
 
-        return "비밀번호 변경 성공";
+        return member;
     }
 }

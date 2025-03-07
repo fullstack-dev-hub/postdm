@@ -46,10 +46,10 @@ public class MemberController {
             @ApiResponse(responseCode = "200", description = "성공"),
     })
     @PostMapping("/check-certification")
-    public ResponseTemplate<String> checkCertificationNumber(@RequestBody @Valid CheckCertificationRequestDto checkCertificationRequestDto) {
-        String success =  memberService.checkCertificationNumber(checkCertificationRequestDto);
+    public ResponseTemplate<Boolean> checkCertificationNumber(@RequestBody @Valid CheckCertificationRequestDto checkCertificationRequestDto) {
+        boolean success =  memberService.checkCertificationNumber(checkCertificationRequestDto);
 
-        return new ResponseTemplate<>(HttpStatus.OK, success, "****");
+        return new ResponseTemplate<>(HttpStatus.OK, "이메일 인증 성공", success);
     }
 
     @Operation(summary = "비밀번호 재설정 컨트롤러")
@@ -57,9 +57,9 @@ public class MemberController {
             @ApiResponse(responseCode = "200", description = "성공"),
     })
     @PostMapping("/reset-password")
-    public ResponseTemplate<String> resetPassword(@RequestBody @Valid ResetPasswordRequestDto requestDto) {
-        String success = memberService.resetPassword(requestDto);
+    public ResponseTemplate<Member> resetPassword(@RequestBody @Valid ResetPasswordRequestDto requestDto) {
+        Member member = memberService.resetPassword(requestDto);
 
-        return new ResponseTemplate<>(HttpStatus.OK, success, "****");
+        return new ResponseTemplate<>(HttpStatus.OK, "비밀번호 변경 성공", member);
     }
 }

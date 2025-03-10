@@ -3,15 +3,11 @@ package com.postdm.backend.domain.email.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 
-@Schema(description = "이메일 인증 DTO")
-@Getter
-@Setter
-@NoArgsConstructor
-public class EmailCertificationRequestDto { // 이메일 인증 데이터를 전송하기 위한 DTO
+@Schema(description = "인증번호 확인 DTO")
+@Data
+public class CheckCertificationRequestDto {
 
     @NotBlank
     private String username;
@@ -19,4 +15,7 @@ public class EmailCertificationRequestDto { // 이메일 인증 데이터를 전
     @NotBlank
     @Email
     private String email;
+
+    @NotBlank
+    private String certificationNumber;
 }

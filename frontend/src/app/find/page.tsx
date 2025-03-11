@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/solid";
 import PrimaryButton from "@/components/find/PrimaryButton";
 import InputField from "@/components/find/InputField";
+import Title from "@/components/Title";
 
 const FindPage = () => {
   const router = useRouter();
@@ -43,10 +44,8 @@ const FindPage = () => {
   };
 
   return (
-    <div className="flex flex-col items-center w-[390px] h-[844px] mx-auto p-6">
-      <div className="w-full h-16 border-b border-gray-400 flex items-center justify-center text-gray-500">
-        상단바 공간
-      </div>
+    <div className="flex flex-col items-center w-[390px] pt-[164px] h-[844px] mx-auto p-6">
+      <Title pageTitle="아이디 / 비밀번호 찾기" />
 
       <div className="w-full flex border-b">
         <button

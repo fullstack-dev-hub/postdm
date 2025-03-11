@@ -19,7 +19,7 @@ const LoginPage = () => {
 
   return (
     <div className="flex flex-col items-center w-[390px] pt-[164px] h-[844px] mx-auto p-6">
-      <Title pageTitle="회원가입" />
+      <Title pageTitle="로그인" />
 
       <div className="w-full mt-8">
         <label className="block text-left text-lg font-medium text-gray-700">

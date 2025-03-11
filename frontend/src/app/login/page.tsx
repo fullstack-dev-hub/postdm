@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Title from "@/components/Title";
 const LoginPage = () => {
   const [id, setId] = useState("");
   const [password, setPassword] = useState("");
@@ -17,10 +18,8 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="flex flex-col items-center w-[390px] h-[844px] mx-auto p-6">
-      <div className="w-full h-16 border-b border-gray-400 flex items-center justify-center text-gray-500">
-        상단바 공간
-      </div>
+    <div className="flex flex-col items-center w-[390px] pt-[164px] h-[844px] mx-auto p-6">
+      <Title pageTitle="회원가입" />
 
       <div className="w-full mt-8">
         <label className="block text-left text-lg font-medium text-gray-700">

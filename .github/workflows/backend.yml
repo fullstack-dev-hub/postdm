@@ -21,6 +21,18 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-2
+      - name: Update Security Group for GitHub Actions
+        run: |
+          GITHUB_IPS=$(curl -s https://api.github.com/meta | jq -r '.actions[]')
+          SECURITY_GROUP_ID=${{ secrets.AWS_POSTDM_SG_ID }}
+
+          for IP in $GITHUB_IPS; do
+            aws ec2 authorize-security-group-ingress \
+              --group-id $SECURITY_GROUP_ID \
+              --protocol tcp \
+              --port 22 \
+              --cidr $IP
+          done
 
       - name: Login to AWS ECR
         run: |

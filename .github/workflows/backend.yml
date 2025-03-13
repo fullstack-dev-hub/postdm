@@ -1,0 +1,59 @@
+name: Deploy Backend to EC2
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: 17
+
+      - name: Build backend project
+        run: |
+          cd backend
+          ./gradlew build -x test
+
+      - name: Build Docker image and push to AWS ECR
+        run: |
+          cd backend
+          docker build -t my-backend-app . 
+          docker tag my-backend-app:latest ${{ secrets.AWS_ECR_REPOSITORY }}/my-backend-app:latest
+          docker push ${{ secrets.AWS_ECR_REPOSITORY }}/my-backend-app:latest
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: "ap-northeast-2"
+
+      - name: Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ec2-user
+          key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+          script: |
+            cd /home/ec2-user/backend
+            echo "PULLING LATEST IMAGE..."
+            sudo docker pull ${{ secrets.AWS_ECR_REPOSITORY }}/my-backend-app:latest
+            
+            echo "STOPPING EXISTING CONTAINER..."
+            sudo docker-compose down || true  # 기존 컨테이너 중지
+            
+            echo "UPDATING .env FILE..."
+            echo "MYSQL_URL=${MYSQL_URL}" > .env
+            echo "MYSQL_USERNAME=${MYSQL_USERNAME}" >> .env
+            echo "MYSQL_PASSWORD=${MYSQL_PASSWORD}" >> .env
+            
+            echo "STARTING NEW CONTAINER..."
+            sudo docker-compose up -d

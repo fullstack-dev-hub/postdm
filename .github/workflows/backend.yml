@@ -78,7 +78,7 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ec2-user
           key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-          env:
+          envs:
             MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
             MYSQL_URL: ${{ secrets.MYSQL_URL }}
             MYSQL_USERNAME: ${{ secrets.MYSQL_USERNAME }}
@@ -97,7 +97,7 @@ jobs:
             echo "MYSQL_USERNAME=$MYSQL_USERNAME" >> .env
             echo "MYSQL_PASSWORD=$MYSQL_PASSWORD" >> .env
             echo "MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD" >> .env
-            echo "MYSQL_DATABASE=MYSQL_DATABASE" >> .env
+            echo "MYSQL_DATABASE=$MYSQL_DATABASE" >> .env
             
             echo "STARTING NEW CONTAINER..."
             sudo docker-compose up -d

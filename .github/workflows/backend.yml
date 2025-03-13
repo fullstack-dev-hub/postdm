@@ -78,12 +78,6 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ec2-user
           key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-          envs:
-            MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
-            MYSQL_URL: ${{ secrets.MYSQL_URL }}
-            MYSQL_USERNAME: ${{ secrets.MYSQL_USERNAME }}
-            MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
-            MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
           script: |
             cd /home/ec2-user/backend
             echo "PULLING LATEST IMAGE..."
@@ -93,11 +87,11 @@ jobs:
             sudo docker-compose down || true
             
             echo "UPDATING .env FILE..."
-            echo "MYSQL_URL=$MYSQL_URL" > .env
-            echo "MYSQL_USERNAME=$MYSQL_USERNAME" >> .env
-            echo "MYSQL_PASSWORD=$MYSQL_PASSWORD" >> .env
-            echo "MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD" >> .env
-            echo "MYSQL_DATABASE=$MYSQL_DATABASE" >> .env
+            echo "MYSQL_URL=${{ secrets.MYSQL_URL }}" > .env
+            echo "MYSQL_USERNAME=${{ secrets.MYSQL_USERNAME }}" >> .env
+            echo "MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}" >> .env
+            echo "MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}" >> .env
+            echo "MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }}" >> .env
             
             echo "STARTING NEW CONTAINER..."
             sudo docker-compose up -d

@@ -22,38 +22,26 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-2
 
-      - name: Update Security Group for GitHub Actions
+      - name: Update Security Group for GitHub Actions (Single Rule)
         run: |
-          GITHUB_IPS=$(curl -s https://api.github.com/meta | jq -r '.actions[]')
+          GITHUB_IP=$(curl -s https://api.github.com/meta | jq -r '.actions[]' | head -n 1)  # 최신 GitHub Actions IP 1개만 가져오기
           SECURITY_GROUP_ID=${{ secrets.AWS_POSTDM_SG_ID }}
-          
-          for IP in $GITHUB_IPS; do
-            EXISTS=$(aws ec2 describe-security-groups --group-ids $SECURITY_GROUP_ID --query "SecurityGroups[*].IpPermissions[?ToPort==\`22\`].IpRanges[*].CidrIp" --output text | grep "$IP" || true)
-          
-            if [[ -z "$EXISTS" ]]; then
-              echo "Adding new rule for IP: $IP"
-              aws ec2 authorize-security-group-ingress \
-                --group-id $SECURITY_GROUP_ID \
-                --protocol tcp \
-                --port 22 \
-                --cidr $IP
-            else
-              echo "IP $IP is already in the security group. Skipping."
-            fi
+
+          echo "Current GitHub Actions Runner IP: $GITHUB_IP"
+
+          OLD_IPS=$(aws ec2 describe-security-groups --group-ids $SECURITY_GROUP_ID \
+            --query "SecurityGroups[*].IpPermissions[?ToPort==\`22\`].IpRanges[*].CidrIp" --output text)
+
+          for OLD_IP in $OLD_IPS; do
+            echo "Removing old SSH rule for IP: $OLD_IP"
+            aws ec2 revoke-security-group-ingress --group-id $SECURITY_GROUP_ID \
+              --protocol tcp --port 22 --cidr $OLD_IP || true
           done
 
-      - name: Remove Oldest Security Group Rules if Limit Exceeded
-        run: |
-          RULE_COUNT=$(aws ec2 describe-security-groups --group-ids $SECURITY_GROUP_ID --query "length(SecurityGroups[*].IpPermissions[?ToPort==\`22\`].IpRanges[*].CidrIp)" --output text)
-      
-          MAX_RULES=10
-      
-          if [[ "$RULE_COUNT" -ge "$MAX_RULES" ]]; then
-            OLDEST_IP=$(aws ec2 describe-security-groups --group-ids $SECURITY_GROUP_ID --query "SecurityGroups[*].IpPermissions[?ToPort==\`22\`].IpRanges[*].CidrIp" --output text | head -n 1)
-      
-            echo "Removing oldest IP: $OLDEST_IP"
-            aws ec2 revoke-security-group-ingress --group-id $SECURITY_GROUP_ID --protocol tcp --port 22 --cidr $OLDEST_IP
-          fi
+          echo "Adding new SSH rule for IP: $GITHUB_IP"
+          aws ec2 authorize-security-group-ingress --group-id $SECURITY_GROUP_ID \
+            --protocol tcp --port 22 --cidr $GITHUB_IP
+
 
       - name: Login to AWS ECR
         run: |

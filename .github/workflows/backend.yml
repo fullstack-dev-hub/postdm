@@ -44,8 +44,8 @@ jobs:
         run: |
           cd backend
           docker build -t backend-service . 
-          docker tag backend-service:latest ${{ secrets.AWS_ECR_REPOSITORY }}/backend-service:latest
-          docker push ${{ secrets.AWS_ECR_REPOSITORY }}/backend-service:latest
+          docker tag backend-service:latest ${{ secrets.AWS_ECR_REPOSITORY }}:latest
+          docker push ${{ secrets.AWS_ECR_REPOSITORY }}:latest
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -60,10 +60,10 @@ jobs:
           script: |
             cd /home/ec2-user/backend
             echo "PULLING LATEST IMAGE..."
-            sudo docker pull ${{ secrets.AWS_ECR_REPOSITORY }}/backend-app:latest
+            sudo docker pull ${{ secrets.AWS_ECR_REPOSITORY }}:latest
             
             echo "STOPPING EXISTING CONTAINER..."
-            sudo docker-compose down || true  # 기존 컨테이너 중지
+            sudo docker-compose down || true
             
             echo "UPDATING .env FILE..."
             echo "MYSQL_URL=${MYSQL_URL}" > .env

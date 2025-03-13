@@ -15,6 +15,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+
+      - name: Login to AWS ECR
+        run: |
+          aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin ${{ secrets.AWS_ECR_REPOSITORY }}
+
       - name: Set up Java 17
         uses: actions/setup-java@v3
         with:
@@ -32,9 +43,9 @@ jobs:
       - name: Build Docker image and push to AWS ECR
         run: |
           cd backend
-          docker build -t my-backend-app . 
-          docker tag my-backend-app:latest ${{ secrets.AWS_ECR_REPOSITORY }}/my-backend-app:latest
-          docker push ${{ secrets.AWS_ECR_REPOSITORY }}/my-backend-app:latest
+          docker build -t backend-service . 
+          docker tag backend-service:latest ${{ secrets.AWS_ECR_REPOSITORY }}/backend-service:latest
+          docker push ${{ secrets.AWS_ECR_REPOSITORY }}/backend-service:latest
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -49,7 +60,7 @@ jobs:
           script: |
             cd /home/ec2-user/backend
             echo "PULLING LATEST IMAGE..."
-            sudo docker pull ${{ secrets.AWS_ECR_REPOSITORY }}/my-backend-app:latest
+            sudo docker pull ${{ secrets.AWS_ECR_REPOSITORY }}/backend-app:latest
             
             echo "STOPPING EXISTING CONTAINER..."
             sudo docker-compose down || true  # 기존 컨테이너 중지

@@ -54,6 +54,9 @@ dependencies {
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	testImplementation 'com.h2database:h2' //테스트 환경 h2 DB
 	testImplementation 'org.assertj:assertj-core:3.24.2' //테스트 검증을 위한 AssertJ 라이브러리
+
+	implementation 'org.springframework.boot:spring-boot-starter-actuator' // Actuator 기능으로 서버 및 애플리케이션 상태 확인
+	runtimeOnly 'mysql:mysql-connector-java:8.0.33'
 }
 
 tasks.named('test') {

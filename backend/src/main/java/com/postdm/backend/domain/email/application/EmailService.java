@@ -49,15 +49,26 @@ public class EmailService { // 이메일 관련 서비스
         certificationRepository.save(certificationEntity);
     }
 
-    public CertificationEntity resetCertification(EmailCertificationRequestDto emailCertificationRequestDto) {
+    public void resetCertification(EmailCertificationRequestDto emailCertificationRequestDto) {
         String username = emailCertificationRequestDto.getUsername();
         String email = emailCertificationRequestDto.getEmail();
 
+        boolean existedUsername = memberRepository.existsByUsername(username);
+
+        if(!existedUsername){
+            throw new CustomException(ErrorCode.MEMBER_NOT_FOUND);
+        }
+
         String certificationNumber = CertificationNumber.getCertificationNumber();
-        emailProvider.sendCertificationMail(email, certificationNumber);
+
+        boolean isSucceed = emailProvider.sendCertificationMail(email, certificationNumber);
+        if (!isSucceed) {
+            throw new CustomException(ErrorCode.EMAIL_SEND_FAILED);
+        }
 
         CertificationEntity certificationEntity = new CertificationEntity(username, email, bCryptPasswordEncoder.encode(certificationNumber));
-        return certificationRepository.save(certificationEntity);
+
+        certificationRepository.save(certificationEntity);
     }
 
     public void checkCertificationNumber(CheckCertificationRequestDto checkCertificationRequestDto) {

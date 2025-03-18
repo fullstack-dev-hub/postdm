@@ -34,7 +34,7 @@ public class AuthController { // 로그인 및 회원 가입 컨트롤러
         this.emailService = emailService;
     }
 
-    @Operation(summary = "아이디 중복 확인 컨트롤러")
+    @Operation(summary = "아이디 중복 확인 컨트롤러", description = "아이디 중복 확인을 요청하는 컨트롤러 입니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공"),
     })
@@ -44,7 +44,7 @@ public class AuthController { // 로그인 및 회원 가입 컨트롤러
         return new ResponseTemplate<>(HttpStatus.OK, "사용할 수 있는 아이디 입니다.");
     }
 
-    @Operation(summary = "이메일 인증 확인 컨트롤러")
+    @Operation(summary = "이메일 인증 확인 컨트롤러", description = "이메일 인증 번호 확인을 요청하는 컨트롤러 입니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공"),
     })
@@ -55,7 +55,7 @@ public class AuthController { // 로그인 및 회원 가입 컨트롤러
         return new ResponseTemplate<>(HttpStatus.OK, "이메일 인증 성공");
     }
 
-    @Operation(summary = "회원가입 컨트롤러")
+    @Operation(summary = "회원가입 컨트롤러", description = "회원가입을 요청하는 컨트롤러 입니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공"),
     })
@@ -66,7 +66,7 @@ public class AuthController { // 로그인 및 회원 가입 컨트롤러
         return new ResponseTemplate<>(HttpStatus.OK, "회원가입 성공");
     }
 
-    @Operation(summary = "로그인 컨트롤러")
+    @Operation(summary = "로그인 컨트롤러", description = "로그인을 요청하는 컨트롤러 입니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공"),
     })

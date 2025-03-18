@@ -10,14 +10,12 @@ import lombok.NoArgsConstructor;
 public class TokenInfo { // 토큰 전송을 위한 DTO
     private String grantType;
     private String accessToken;
-    private String refreshToken;
     private String role;
 
     @Builder
-    public TokenInfo(String grantType, String accessToken, String refreshToken, String role) {
+    public TokenInfo(String grantType, String accessToken, String role) {
         this.grantType = grantType;
         this.accessToken = accessToken;
-        this.refreshToken = refreshToken;
         this.role = role;
     }
 }

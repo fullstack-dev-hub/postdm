@@ -50,7 +50,7 @@ public class MemberController {
             @ApiResponse(responseCode = "200", description = "성공"),
     })
     @PostMapping("/check-certification")
-    public ResponseTemplate<Boolean> checkCertificationNumber(@RequestBody @Valid CheckCertificationRequestDto checkCertificationRequestDto) {
+    public ResponseTemplate<?> checkCertificationNumber(@RequestBody @Valid CheckCertificationRequestDto checkCertificationRequestDto) {
         emailService.checkCertificationNumber(checkCertificationRequestDto);
 
         return new ResponseTemplate<>(HttpStatus.OK, "이메일 인증 성공");

@@ -1,5 +1,6 @@
 package com.postdm.backend.domain.member.api;
 
+import com.postdm.backend.domain.email.application.EmailService;
 import com.postdm.backend.domain.email.dto.CheckCertificationRequestDto;
 import com.postdm.backend.domain.member.application.MemberService;
 import com.postdm.backend.domain.member.domain.entity.Member;
@@ -22,8 +23,11 @@ public class MemberController {
 
     private final MemberService memberService;
 
-    public MemberController(MemberService memberService) {
+    private final EmailService emailService;
+
+    public MemberController(MemberService memberService, EmailService emailService) {
         this.memberService = memberService;
+        this.emailService = emailService;
     }
 
     @Operation(summary = "아이디 찾기 컨트롤러")
@@ -47,7 +51,7 @@ public class MemberController {
     })
     @PostMapping("/check-certification")
     public ResponseTemplate<Boolean> checkCertificationNumber(@RequestBody @Valid CheckCertificationRequestDto checkCertificationRequestDto) {
-        boolean success =  memberService.checkCertificationNumber(checkCertificationRequestDto);
+        boolean success =  emailService.checkCertificationNumber(checkCertificationRequestDto);
 
         return new ResponseTemplate<>(HttpStatus.OK, "이메일 인증 성공", success);
     }

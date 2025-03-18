@@ -36,12 +36,11 @@ public class AuthService { // 로그인 및 회원가입 서비스
     @Value("${jwt.expiredMS}")
     private int refreshedMS;
 
-    public String idCheck(String username) { // 아이디 중복확인 서비스
+    public void idCheck(String username) { // 아이디 중복확인 서비스
         boolean existedUsername = memberRepository.existsByUsername(username); // 데이터베이스에서 사용자 아이디가 존재하는지 여부
         if(existedUsername) {
             throw new CustomException(ErrorCode.DUPLICATED_ID);
         }
-        return username;
     }
 
     public Member signUp(SignUpRequestDto signUpRequestDto) { // 회원가입 서비스

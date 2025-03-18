@@ -10,6 +10,7 @@ import lombok.Data;
 @Data
 public class FindUsernameRequestDto {
 
+    @Schema(description = "사용자 이메일", example = "test1@test.com")
     @NotBlank
     @Email
     private String email;

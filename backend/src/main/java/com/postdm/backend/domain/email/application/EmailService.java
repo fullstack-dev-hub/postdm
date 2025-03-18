@@ -38,7 +38,11 @@ public class EmailService { // 이메일 관련 서비스
 
         String certificationNumber = CertificationNumber.getCertificationNumber();
 
-        emailProvider.sendCertificationMail(email, certificationNumber);
+        boolean isSucceed = emailProvider.sendCertificationMail(email, certificationNumber);
+
+        if (!isSucceed) {
+            throw new CustomException(ErrorCode.EMAIL_SEND_FAILED);
+        }
 
         CertificationEntity certificationEntity = new CertificationEntity(username, email, bCryptPasswordEncoder.encode(certificationNumber));
 

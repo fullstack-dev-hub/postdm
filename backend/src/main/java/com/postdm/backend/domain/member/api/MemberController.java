@@ -51,9 +51,9 @@ public class MemberController {
     })
     @PostMapping("/check-certification")
     public ResponseTemplate<Boolean> checkCertificationNumber(@RequestBody @Valid CheckCertificationRequestDto checkCertificationRequestDto) {
-        boolean success =  emailService.checkCertificationNumber(checkCertificationRequestDto);
+        emailService.checkCertificationNumber(checkCertificationRequestDto);
 
-        return new ResponseTemplate<>(HttpStatus.OK, "이메일 인증 성공", success);
+        return new ResponseTemplate<>(HttpStatus.OK, "이메일 인증 성공");
     }
 
     @Operation(summary = "비밀번호 재설정 컨트롤러")

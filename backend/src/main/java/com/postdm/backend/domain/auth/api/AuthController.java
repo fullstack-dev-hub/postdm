@@ -33,9 +33,9 @@ public class AuthController { // 로그인 및 회원 가입 컨트롤러
             @ApiResponse(responseCode = "200", description = "성공"),
     })
     @PostMapping("/id-check") // 아이디 중복 확인 요청
-    public ResponseTemplate<String> idCheck(@RequestBody @Valid IdCheckRequestDto idCheckRequestDto) {
-        String username = authService.idCheck(idCheckRequestDto.getUsername());
-        return new ResponseTemplate<>(HttpStatus.OK, "사용할 수 있는 아이디 입니다.", username);
+    public ResponseTemplate<?> idCheck(@RequestBody @Valid IdCheckRequestDto idCheckRequestDto) {
+        authService.idCheck(idCheckRequestDto.getUsername());
+        return new ResponseTemplate<>(HttpStatus.OK, "사용할 수 있는 아이디 입니다.");
     }
 
     @Operation(summary = "회원가입 컨트롤러")

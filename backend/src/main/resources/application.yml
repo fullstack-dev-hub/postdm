@@ -18,3 +18,8 @@ springdoc:
       enabled: true
   cache:
     disabled: true
+
+management:
+  endpoint:
+    health:
+      show-details: when_authorized

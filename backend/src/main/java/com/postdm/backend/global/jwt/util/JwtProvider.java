@@ -97,6 +97,7 @@ public class JwtProvider { // JWT 발급을 위한 Provider
                 .grantType("Bearer")
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
+                .role(role)
                 .build();
     }
 

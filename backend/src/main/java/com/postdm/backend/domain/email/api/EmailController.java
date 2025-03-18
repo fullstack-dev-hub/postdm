@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,8 +18,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/email")
 public class EmailController { // 이메일 관련 컨트롤러
 
-    @Autowired
-    private EmailService emailService;
+    private final EmailService emailService;
+
+    public EmailController(EmailService emailService) {
+        this.emailService = emailService;
+    }
 
     @Operation(summary = "회원가입용 이메일 전송 컨트롤러")
     @ApiResponses(value = {

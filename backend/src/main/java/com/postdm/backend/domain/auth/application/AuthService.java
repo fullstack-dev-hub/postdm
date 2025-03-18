@@ -13,7 +13,6 @@ import com.postdm.backend.global.jwt.dto.TokenInfo;
 import com.postdm.backend.global.jwt.util.JwtProvider;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -21,20 +20,26 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthService { // 로그인 및 회원가입 서비스
 
-    @Autowired
-    private MemberRepository memberRepository;
+    private final MemberRepository memberRepository;
+    private final CertificationRepository certificationRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final JwtProvider jwtProvider;
+    private final int refreshedMS;
 
-    @Autowired
-    private CertificationRepository certificationRepository;
+    // 생성자 주입 방식
+    public AuthService(
+            MemberRepository memberRepository,
+            CertificationRepository certificationRepository,
+            BCryptPasswordEncoder bCryptPasswordEncoder,
+            JwtProvider jwtProvider,
+            @Value("${jwt.expiredMS}") int refreshedMS) {
+        this.memberRepository = memberRepository;
+        this.certificationRepository = certificationRepository;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.jwtProvider = jwtProvider;
+        this.refreshedMS = refreshedMS;
+    }
 
-    @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
-
-    @Autowired
-    private JwtProvider jwtProvider;
-
-    @Value("${jwt.expiredMS}")
-    private int refreshedMS;
 
     public void idCheck(String username) { // 아이디 중복확인 서비스
         boolean existedUsername = memberRepository.existsByUsername(username); // 데이터베이스에서 사용자 아이디가 존재하는지 여부

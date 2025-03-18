@@ -6,7 +6,6 @@ import com.postdm.backend.domain.auth.dto.SignInRequestDto;
 import com.postdm.backend.domain.auth.dto.SignUpRequestDto;
 import com.postdm.backend.domain.email.application.EmailService;
 import com.postdm.backend.domain.email.dto.CheckCertificationRequestDto;
-import com.postdm.backend.domain.member.domain.entity.Member;
 import com.postdm.backend.global.jwt.dto.TokenInfo;
 import com.postdm.backend.global.template.ResponseTemplate;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,7 +14,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,11 +25,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/auth")
 public class AuthController { // 로그인 및 회원 가입 컨트롤러
 
-    @Autowired
-    private AuthService authService;
+    private final AuthService authService;
 
-    @Autowired
-    private EmailService emailService;
+    private final EmailService emailService;
+
+    public AuthController(AuthService authService, EmailService emailService) {
+        this.authService = authService;
+        this.emailService = emailService;
+    }
 
     @Operation(summary = "아이디 중복 확인 컨트롤러")
     @ApiResponses(value = {

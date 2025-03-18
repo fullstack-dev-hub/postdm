@@ -7,24 +7,27 @@ import com.postdm.backend.domain.email.dto.EmailCertificationRequestDto;
 import com.postdm.backend.domain.member.domain.repository.MemberRepository;
 import com.postdm.backend.global.common.exception.CustomException;
 import com.postdm.backend.global.common.response.ErrorCode;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class EmailService { // 이메일 관련 서비스
 
-    @Autowired
-    private MemberRepository memberRepository;
+    private final MemberRepository memberRepository;
+    private final CertificationRepository certificationRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final EmailProvider emailProvider;
 
-    @Autowired
-    private CertificationRepository certificationRepository;
-
-    @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
-
-    @Autowired
-    private EmailProvider emailProvider;
+    public EmailService(
+            MemberRepository memberRepository,
+            CertificationRepository certificationRepository,
+            BCryptPasswordEncoder bCryptPasswordEncoder,
+            EmailProvider emailProvider) {
+        this.memberRepository = memberRepository;
+        this.certificationRepository = certificationRepository;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.emailProvider = emailProvider;
+    }
 
     public void emailCertification(EmailCertificationRequestDto emailCertificationRequestDto) { // 인증메일 전송 서비스
 

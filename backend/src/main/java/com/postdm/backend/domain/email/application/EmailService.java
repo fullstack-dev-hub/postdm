@@ -60,7 +60,7 @@ public class EmailService { // 이메일 관련 서비스
         return certificationRepository.save(certificationEntity);
     }
 
-    public boolean checkCertificationNumber(CheckCertificationRequestDto checkCertificationRequestDto) {
+    public void checkCertificationNumber(CheckCertificationRequestDto checkCertificationRequestDto) {
         String username  = checkCertificationRequestDto.getUsername();
         String email = checkCertificationRequestDto.getEmail();
         String certificationNumber = checkCertificationRequestDto.getCertificationNumber();
@@ -78,7 +78,5 @@ public class EmailService { // 이메일 관련 서비스
         if(!isMatched) {
             throw new CustomException(ErrorCode.CERTIFICATION_FAILED);
         }
-
-        return true;
     }
 }

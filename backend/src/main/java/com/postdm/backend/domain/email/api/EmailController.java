@@ -27,10 +27,10 @@ public class EmailController { // 이메일 관련 컨트롤러
             @ApiResponse(responseCode = "200", description = "성공"),
     })
     @PostMapping("/email-certification") // 이메일 전송 요청 api
-    public ResponseTemplate<CertificationEntity> emailCertification(@RequestBody @Valid EmailCertificationRequestDto emailCertificationRequestDto) {
-        CertificationEntity certificationEntity = emailService.emailCertification(emailCertificationRequestDto);
+    public ResponseTemplate<?> emailCertification(@RequestBody @Valid EmailCertificationRequestDto emailCertificationRequestDto) {
+        emailService.emailCertification(emailCertificationRequestDto);
 
-        return new ResponseTemplate<>(HttpStatus.OK, "이메일이 성공적으로 발송되었습니다.", certificationEntity);
+        return new ResponseTemplate<>(HttpStatus.OK, "이메일이 성공적으로 발송되었습니다.");
     }
 
     @Operation(summary = "비밀번호 재설정용 이메일 전송 컨트롤러")
@@ -38,9 +38,9 @@ public class EmailController { // 이메일 관련 컨트롤러
             @ApiResponse(responseCode = "200", description = "성공"),
     })
     @PostMapping("/reset-certification")
-    public ResponseTemplate<CertificationEntity> resetCertification(@RequestBody @Valid EmailCertificationRequestDto emailCertificationRequestDto) {
-        CertificationEntity certificationEntity = emailService.resetCertification(emailCertificationRequestDto);
+    public ResponseTemplate<?> resetCertification(@RequestBody @Valid EmailCertificationRequestDto emailCertificationRequestDto) {
+        emailService.resetCertification(emailCertificationRequestDto);
 
-        return new ResponseTemplate<>(HttpStatus.OK, "이메일이 성공적으로 발송되었습니다.", certificationEntity);
+        return new ResponseTemplate<>(HttpStatus.OK, "이메일이 성공적으로 발송되었습니다.");
     }
 }

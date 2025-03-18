@@ -68,7 +68,7 @@ public class EmailService { // 이메일 관련 서비스
         CertificationEntity certificationEntity = certificationRepository.findByUsername(username);
 
         if(certificationEntity == null) {
-            throw new IllegalArgumentException();
+            throw new CustomException(ErrorCode.MEMBER_NOT_FOUND);
         }
 
         String encodedCertificationNumber = certificationEntity.getCertificationNumber();
@@ -76,7 +76,7 @@ public class EmailService { // 이메일 관련 서비스
         boolean isMatched = certificationEntity.getEmail().equals(email) && bCryptPasswordEncoder.matches(certificationNumber, encodedCertificationNumber);
 
         if(!isMatched) {
-            throw new IllegalArgumentException();
+            throw new CustomException(ErrorCode.CERTIFICATION_FAILED);
         }
 
         return true;

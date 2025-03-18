@@ -32,7 +32,7 @@ public enum ErrorCode {
     DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 에러"),
 
     // 유효성 에러
-    VALIDATION_FAIL(HttpStatus.BAD_REQUEST, "잘못된 입력 형식입니다."),
+    VALIDATION_FAIL(HttpStatus.BAD_REQUEST, "값이 비어있거나, 잘못된 입력 형식입니다."),
 
 
     METHOD_NOT_ALLOWED(HttpStatus.METHOD_NOT_ALLOWED, "잘못된 HTTP 메서드를 호출했습니다."),

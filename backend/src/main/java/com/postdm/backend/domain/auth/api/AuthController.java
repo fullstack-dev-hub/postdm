@@ -43,10 +43,10 @@ public class AuthController { // 로그인 및 회원 가입 컨트롤러
             @ApiResponse(responseCode = "200", description = "성공"),
     })
     @PostMapping("/sign-up") // 회원 가입 요청
-    public ResponseTemplate<Member> signUp(@RequestBody @Valid SignUpRequestDto signUpRequestDto) {
-        Member member = authService.signUp(signUpRequestDto);
+    public ResponseTemplate<?> signUp(@RequestBody @Valid SignUpRequestDto signUpRequestDto) {
+        authService.signUp(signUpRequestDto);
 
-        return new ResponseTemplate<>(HttpStatus.OK, "회원가입 성공", member);
+        return new ResponseTemplate<>(HttpStatus.OK, "회원가입 성공");
     }
 
     @Operation(summary = "로그인 컨트롤러")

@@ -4,6 +4,8 @@ import com.postdm.backend.domain.auth.application.AuthService;
 import com.postdm.backend.domain.auth.dto.IdCheckRequestDto;
 import com.postdm.backend.domain.auth.dto.SignInRequestDto;
 import com.postdm.backend.domain.auth.dto.SignUpRequestDto;
+import com.postdm.backend.domain.email.application.EmailService;
+import com.postdm.backend.domain.email.dto.CheckCertificationRequestDto;
 import com.postdm.backend.domain.member.domain.entity.Member;
 import com.postdm.backend.global.jwt.dto.TokenInfo;
 import com.postdm.backend.global.template.ResponseTemplate;
@@ -28,6 +30,9 @@ public class AuthController { // 로그인 및 회원 가입 컨트롤러
     @Autowired
     private AuthService authService;
 
+    @Autowired
+    private EmailService emailService;
+
     @Operation(summary = "아이디 중복 확인 컨트롤러")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공"),
@@ -36,6 +41,17 @@ public class AuthController { // 로그인 및 회원 가입 컨트롤러
     public ResponseTemplate<?> idCheck(@RequestBody @Valid IdCheckRequestDto idCheckRequestDto) {
         authService.idCheck(idCheckRequestDto.getUsername());
         return new ResponseTemplate<>(HttpStatus.OK, "사용할 수 있는 아이디 입니다.");
+    }
+
+    @Operation(summary = "이메일 인증 확인 컨트롤러")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공"),
+    })
+    @PostMapping("/check-certification")
+    public ResponseTemplate<?> checkCertificationNumber(@RequestBody @Valid CheckCertificationRequestDto checkCertificationRequestDto) {
+        emailService.checkCertificationNumber(checkCertificationRequestDto);
+
+        return new ResponseTemplate<>(HttpStatus.OK, "이메일 인증 성공");
     }
 
     @Operation(summary = "회원가입 컨트롤러")

@@ -2,8 +2,11 @@ package com.postdm.backend.domain.email.application;
 
 import com.postdm.backend.domain.email.domain.entity.CertificationEntity;
 import com.postdm.backend.domain.email.domain.repository.CertificationRepository;
+import com.postdm.backend.domain.email.dto.CheckCertificationRequestDto;
 import com.postdm.backend.domain.email.dto.EmailCertificationRequestDto;
 import com.postdm.backend.domain.member.domain.repository.MemberRepository;
+import com.postdm.backend.global.common.exception.CustomException;
+import com.postdm.backend.global.common.response.ErrorCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -30,7 +33,7 @@ public class EmailService { // 이메일 관련 서비스
 
         boolean existedEmail = memberRepository.existsByEmail(email);
         if (existedEmail) {
-            throw new IllegalArgumentException("이미 사용중인 이메일 입니다.");
+            throw new CustomException(ErrorCode.DUPLICATED_EMAIL);
         }
 
         String certificationNumber = CertificationNumber.getCertificationNumber();
@@ -51,5 +54,27 @@ public class EmailService { // 이메일 관련 서비스
 
         CertificationEntity certificationEntity = new CertificationEntity(username, email, bCryptPasswordEncoder.encode(certificationNumber));
         return certificationRepository.save(certificationEntity);
+    }
+
+    public boolean checkCertificationNumber(CheckCertificationRequestDto checkCertificationRequestDto) {
+        String username  = checkCertificationRequestDto.getUsername();
+        String email = checkCertificationRequestDto.getEmail();
+        String certificationNumber = checkCertificationRequestDto.getCertificationNumber();
+
+        CertificationEntity certificationEntity = certificationRepository.findByUsername(username);
+
+        if(certificationEntity == null) {
+            throw new IllegalArgumentException();
+        }
+
+        String encodedCertificationNumber = certificationEntity.getCertificationNumber();
+
+        boolean isMatched = certificationEntity.getEmail().equals(email) && bCryptPasswordEncoder.matches(certificationNumber, encodedCertificationNumber);
+
+        if(!isMatched) {
+            throw new IllegalArgumentException();
+        }
+
+        return true;
     }
 }

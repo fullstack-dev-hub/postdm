@@ -43,7 +43,7 @@ public class AuthService { // 로그인 및 회원가입 서비스
         }
     }
 
-    public Member signUp(SignUpRequestDto signUpRequestDto) { // 회원가입 서비스
+    public void signUp(SignUpRequestDto signUpRequestDto) { // 회원가입 서비스
         String nickname = signUpRequestDto.getNickname();
 
         String username = signUpRequestDto.getUsername();
@@ -95,8 +95,6 @@ public class AuthService { // 로그인 및 회원가입 서비스
         memberRepository.save(member); // 데이터베이스에 멤버 저장
 
         certificationRepository.delete(certificationEntity); // 회원가입이 완료되면 데이터베이스에서 해당 인증번호 삭제
-
-        return member;
     }
 
     public TokenInfo signIn(SignInRequestDto signInRequestDto, HttpServletResponse response) { // 로그인 서비스

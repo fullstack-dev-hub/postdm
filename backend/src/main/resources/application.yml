@@ -18,3 +18,4 @@ springdoc:
       enabled: true
   cache:
     disabled: true
+  override-with-generic-response: false

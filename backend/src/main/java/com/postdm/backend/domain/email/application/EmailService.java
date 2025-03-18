@@ -26,7 +26,7 @@ public class EmailService { // 이메일 관련 서비스
     @Autowired
     private EmailProvider emailProvider;
 
-    public CertificationEntity emailCertification(EmailCertificationRequestDto emailCertificationRequestDto) { // 인증메일 전송 서비스
+    public void emailCertification(EmailCertificationRequestDto emailCertificationRequestDto) { // 인증메일 전송 서비스
 
         String username = emailCertificationRequestDto.getUsername();
         String email = emailCertificationRequestDto.getEmail();
@@ -46,7 +46,7 @@ public class EmailService { // 이메일 관련 서비스
 
         CertificationEntity certificationEntity = new CertificationEntity(username, email, bCryptPasswordEncoder.encode(certificationNumber));
 
-        return certificationRepository.save(certificationEntity);
+        certificationRepository.save(certificationEntity);
     }
 
     public CertificationEntity resetCertification(EmailCertificationRequestDto emailCertificationRequestDto) {

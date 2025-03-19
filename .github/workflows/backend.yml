@@ -28,26 +28,6 @@ jobs:
           echo "Logging into AWS ECR: $ECR_URL"
           aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin $ECR_URL
 
-      - name: Set up Java 17
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: 17
-
-      - name: Grant execute permission to Gradle Wrapper
-        run: chmod +x backend/gradlew
-
-      - name: Build backend project
-        run: |
-          cd backend
-          ./gradlew build -x test
-
-      - name: Verify JAR file exists
-        run: |
-          cd backend
-          echo "Checking if JAR file exists..."
-          ls build/libs/*.jar || { echo "ERROR: JAR file not found."; exit 1; }
-
       - name: Build Docker image and push to AWS ECR
         run: |
           cd backend
@@ -68,16 +48,17 @@ jobs:
           key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
           script: |
             cd /home/${{ secrets.EC2_USERNAME }}/backend
+            
             echo "PULLING LATEST IMAGE..."
+            sudo docker image rm ${{ secrets.AWS_ECR_REPOSITORY }}:latest || true
             sudo docker pull ${{ secrets.AWS_ECR_REPOSITORY }}:latest
             
             echo "STOPPING AND REMOVING EXISTING CONTAINERS..."
             sudo docker-compose down --remove-orphans || true
             
             echo "REMOVING UNUSED DOCKER IMAGES..."
-            sudo docker system prune -f
+            sudo docker system prune -af
         
-            
             echo "UPDATING .env FILE..."
             echo "MYSQL_URL=${{ secrets.MYSQL_URL }}" > .env
             echo "MYSQL_USERNAME=${{ secrets.MYSQL_USERNAME }}" >> .env
@@ -89,6 +70,6 @@ jobs:
             cat .env || { echo "ERROR: .env file not created properly."; exit 1; }
             
             echo "STARTING NEW CONTAINER..."
-            sudo docker-compose up -d
+            sudo docker-compose up -d --force-recreate
             
             echo "✅ DEPLOYMENT COMPLETE!"

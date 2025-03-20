@@ -8,12 +8,15 @@ import lombok.Data;
 @Data
 public class ResetPasswordRequestDto {
 
+    @Schema(description = "사용자 아이디", example = "test123")
     @NotBlank
     private String username;
 
+    @Schema(description = "새로운 비밀번호", example = "newpassword1")
     @NotBlank
     private String password;
 
+    @Schema(description = "새로운 비밀번호 확인", example = "newpassword1")
     @NotBlank
     private String confirmPassword;
 

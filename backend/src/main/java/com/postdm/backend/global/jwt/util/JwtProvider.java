@@ -52,12 +52,13 @@ public class JwtProvider { // JWT 발급을 위한 Provider
                 .compact();
     }
 
-    public String generateRefreshToken(String username) { // RefreshToken 생성
+    public String generateRefreshToken(String username, String role) { // RefreshToken 생성
         Date now = new Date();
         Date refreshTokenExpiredAt = new Date(now.getTime() + refreshedMs);
 
         return Jwts.builder()
                 .subject(username)
+                .claim("role", role)
                 .issuedAt(now)
                 .expiration(refreshTokenExpiredAt)
                 .signWith(secretKey)
@@ -91,12 +92,12 @@ public class JwtProvider { // JWT 발급을 위한 Provider
     public TokenInfo generateToken(String username, String role) { // 토큰 생성
 
         String accessToken = generateAccessToken(username, role);
-        String refreshToken = generateRefreshToken(username);
+        String refreshToken = generateRefreshToken(username, role);
 
         return TokenInfo.builder()
                 .grantType("Bearer")
                 .accessToken(accessToken)
-                .refreshToken(refreshToken)
+                .role(role)
                 .build();
     }
 

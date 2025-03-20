@@ -35,28 +35,6 @@ public class MemberService {
         return member;
     }
 
-    public boolean checkCertificationNumber(CheckCertificationRequestDto checkCertificationRequestDto) {
-        String username  = checkCertificationRequestDto.getUsername();
-        String email = checkCertificationRequestDto.getEmail();
-        String certificationNumber = checkCertificationRequestDto.getCertificationNumber();
-
-        CertificationEntity certificationEntity = certificationRepository.findByUsername(username);
-
-        if(certificationEntity == null) {
-            throw new IllegalArgumentException();
-        }
-
-        String encodedCertificationNumber = certificationEntity.getCertificationNumber();
-
-        boolean isMatched = certificationEntity.getEmail().equals(email) && bCryptPasswordEncoder.matches(certificationNumber, encodedCertificationNumber);
-
-        if(!isMatched) {
-            throw new IllegalArgumentException();
-        }
-
-        return true;
-    }
-
     public Member resetPassword(ResetPasswordRequestDto resetPasswordRequestDto) {
         String username =  resetPasswordRequestDto.getUsername();
         String password = resetPasswordRequestDto.getPassword();

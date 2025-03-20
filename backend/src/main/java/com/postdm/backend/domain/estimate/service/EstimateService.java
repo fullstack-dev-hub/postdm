@@ -6,6 +6,8 @@ import com.postdm.backend.domain.estimate.entity.EstimateRepository;
 import com.postdm.backend.domain.estimate.service.policy.AdminEstimatePolicy;
 import com.postdm.backend.domain.estimate.service.policy.UserEstimatePolicy;
 import com.postdm.backend.domain.member.domain.entity.Member;
+import com.postdm.backend.global.common.exception.CustomException;
+import com.postdm.backend.global.common.response.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -33,7 +35,7 @@ public class EstimateService {
 
     public EstimateResponseDto createEstimate(String content, Member member) {
         if (content == null || content.trim().isEmpty()) {
-            throw new IllegalArgumentException("견적서 내용은 비어 있을 수 없습니다.");
+            throw new CustomException(ErrorCode.ESTIMATE_NULL);
         }
 
         if (member == null) {
@@ -41,7 +43,7 @@ public class EstimateService {
             if (authentication != null && authentication.getPrincipal() instanceof Member) {
                 member = (Member) authentication.getPrincipal();
             } else {
-                throw new RuntimeException("인증된 사용자가 존재하지 않습니다.");
+                throw new CustomException(ErrorCode.AUTHORIZED_MEMBER_NOT_FOUND);
             }
         }
 
@@ -63,7 +65,7 @@ public class EstimateService {
             if (authentication != null && authentication.getPrincipal() instanceof Member) {
                 member = (Member) authentication.getPrincipal();
             } else {
-                throw new RuntimeException("인증된 사용자가 존재하지 않습니다.");
+                throw new CustomException(ErrorCode.AUTHORIZED_MEMBER_NOT_FOUND);
             }
         }
 

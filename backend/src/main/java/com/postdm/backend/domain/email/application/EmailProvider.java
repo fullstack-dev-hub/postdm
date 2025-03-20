@@ -14,7 +14,7 @@ public class EmailProvider { // 이메일 발송을 위한 Provider
 
     private final String SUBJECT = "[포스트 디엠] 인증 메일 입니다.";
 
-    public void sendCertificationMail(String email, String certificationNumber) {
+    public boolean sendCertificationMail(String email, String certificationNumber) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
@@ -26,8 +26,10 @@ public class EmailProvider { // 이메일 발송을 위한 Provider
             helper.setText(htmlContent, true);
 
             mailSender.send(message);
+            return true;
         } catch (Exception e) {
             e.printStackTrace();
+            return false;
         }
     }
 

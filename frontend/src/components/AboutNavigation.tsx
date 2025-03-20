@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import React from 'react';
 
 interface NavItem {
@@ -11,12 +11,13 @@ interface NavItem {
 const AboutNavigation = () => {
   const [activeSection, setActiveSection] = useState<string>('company');
 
-  const navItems: NavItem[] = [
+  // useMemo를 사용하여 navItems 배열 메모이제이션
+  const navItems = useMemo<NavItem[]>(() => [
     { id: 'company', label: '회사 소개' },
     { id: 'service', label: '서비스 소개' },
     { id: 'location', label: '위치/교통' },
     { id: 'support', label: '고객지원' }
-  ];
+  ], []);
 
   // 현재 보이는 섹션 감지 함수
   const handleScroll = useCallback(() => {

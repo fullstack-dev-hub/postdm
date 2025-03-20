@@ -46,7 +46,10 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+          port: ${{ secrets.PORT }}
           script: |
+            whoami
+            ls -l
             cd /home/${{ secrets.EC2_USERNAME }}/backend
             
             echo "PULLING LATEST IMAGE..."

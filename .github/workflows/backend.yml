@@ -40,6 +40,17 @@ jobs:
           docker logout ${{ secrets.AWS_ECR_REPOSITORY }}
           echo "Logged out from AWS ECR."
 
+      - name: Test SSH Connection
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            echo "Checking SSH connection..."
+            whoami
+
       - name: Deploy to EC2 via SSH
         uses: appleboy/ssh-action@v0.1.7
         with:

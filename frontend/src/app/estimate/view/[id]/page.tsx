@@ -1,4 +1,3 @@
-// app/estimate/view/[id]/page.tsx
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -13,9 +12,23 @@ interface EstimateDetail {
   author: string;
 }
 
-export default function EstimateViewPage({ params }: { params: { id: string } }) {
+// Define the correct page props type for Next.js 15
+interface PageProps {
+  params: {
+    id: string;
+  };
+  searchParams: Record<string, string | string[] | undefined>;
+}
+
+export default function EstimateViewPage({ params, searchParams }: PageProps) {
   const [estimateData, setEstimateData] = useState<EstimateDetail | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // 타입 안전하게 ID 변환 함수 추가
+  const parseId = (id: string): number => {
+    const parsedId = parseInt(id);
+    return isNaN(parsedId) ? -1 : parsedId; // 유효하지 않은 ID는 -1 반환
+  };
 
   useEffect(() => {
     // 실제로는 API 호출로 대체할 부분
@@ -24,7 +37,7 @@ export default function EstimateViewPage({ params }: { params: { id: string } })
       setLoading(true);
       
       // 임시 데이터 (실제로는 API 호출로 대체)
-      const mockData = [
+      const mockData: EstimateDetail[] = [
         {
           id: 1,
           title: '안녕하세요 이번에 문의드릴게 있어서요',
@@ -48,8 +61,9 @@ export default function EstimateViewPage({ params }: { params: { id: string } })
         }
       ];
       
-      // 파라미터로 받은 ID와 일치하는 견적서 찾기
-      const foundEstimate = mockData.find(item => item.id === parseInt(params.id));
+      // 타입 안전한 ID 변환 사용
+      const parsedId = parseId(params.id);
+      const foundEstimate = mockData.find(item => item.id === parsedId);
       
       setEstimateData(foundEstimate || null);
       setLoading(false);

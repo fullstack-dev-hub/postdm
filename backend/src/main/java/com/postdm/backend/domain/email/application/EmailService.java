@@ -2,54 +2,95 @@ package com.postdm.backend.domain.email.application;
 
 import com.postdm.backend.domain.email.domain.entity.CertificationEntity;
 import com.postdm.backend.domain.email.domain.repository.CertificationRepository;
+import com.postdm.backend.domain.email.dto.CheckCertificationRequestDto;
 import com.postdm.backend.domain.email.dto.EmailCertificationRequestDto;
 import com.postdm.backend.domain.member.domain.repository.MemberRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.postdm.backend.global.common.exception.CustomException;
+import com.postdm.backend.global.common.response.ErrorCode;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class EmailService { // 이메일 관련 서비스
 
-    @Autowired
-    private MemberRepository memberRepository;
+    private final MemberRepository memberRepository;
+    private final CertificationRepository certificationRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final EmailProvider emailProvider;
 
-    @Autowired
-    private CertificationRepository certificationRepository;
+    public EmailService(
+            MemberRepository memberRepository,
+            CertificationRepository certificationRepository,
+            BCryptPasswordEncoder bCryptPasswordEncoder,
+            EmailProvider emailProvider) {
+        this.memberRepository = memberRepository;
+        this.certificationRepository = certificationRepository;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.emailProvider = emailProvider;
+    }
 
-    @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
-
-    @Autowired
-    private EmailProvider emailProvider;
-
-    public CertificationEntity emailCertification(EmailCertificationRequestDto emailCertificationRequestDto) { // 인증메일 전송 서비스
+    public void emailCertification(EmailCertificationRequestDto emailCertificationRequestDto) { // 인증메일 전송 서비스
 
         String username = emailCertificationRequestDto.getUsername();
         String email = emailCertificationRequestDto.getEmail();
 
         boolean existedEmail = memberRepository.existsByEmail(email);
         if (existedEmail) {
-            throw new IllegalArgumentException("이미 사용중인 이메일 입니다.");
+            throw new CustomException(ErrorCode.DUPLICATED_EMAIL);
         }
 
         String certificationNumber = CertificationNumber.getCertificationNumber();
 
-        emailProvider.sendCertificationMail(email, certificationNumber);
+        boolean isSucceed = emailProvider.sendCertificationMail(email, certificationNumber);
+
+        if (!isSucceed) {
+            throw new CustomException(ErrorCode.EMAIL_SEND_FAILED);
+        }
 
         CertificationEntity certificationEntity = new CertificationEntity(username, email, bCryptPasswordEncoder.encode(certificationNumber));
 
-        return certificationRepository.save(certificationEntity);
+        certificationRepository.save(certificationEntity);
     }
 
-    public CertificationEntity resetCertification(EmailCertificationRequestDto emailCertificationRequestDto) {
+    public void resetCertification(EmailCertificationRequestDto emailCertificationRequestDto) {
         String username = emailCertificationRequestDto.getUsername();
         String email = emailCertificationRequestDto.getEmail();
 
+        boolean existedUsername = memberRepository.existsByUsername(username);
+
+        if(!existedUsername){
+            throw new CustomException(ErrorCode.MEMBER_NOT_FOUND);
+        }
+
         String certificationNumber = CertificationNumber.getCertificationNumber();
-        emailProvider.sendCertificationMail(email, certificationNumber);
+
+        boolean isSucceed = emailProvider.sendCertificationMail(email, certificationNumber);
+        if (!isSucceed) {
+            throw new CustomException(ErrorCode.EMAIL_SEND_FAILED);
+        }
 
         CertificationEntity certificationEntity = new CertificationEntity(username, email, bCryptPasswordEncoder.encode(certificationNumber));
-        return certificationRepository.save(certificationEntity);
+
+        certificationRepository.save(certificationEntity);
+    }
+
+    public void checkCertificationNumber(CheckCertificationRequestDto checkCertificationRequestDto) {
+        String username  = checkCertificationRequestDto.getUsername();
+        String email = checkCertificationRequestDto.getEmail();
+        String certificationNumber = checkCertificationRequestDto.getCertificationNumber();
+
+        CertificationEntity certificationEntity = certificationRepository.findByUsername(username);
+
+        if(certificationEntity == null) {
+            throw new CustomException(ErrorCode.MEMBER_NOT_FOUND);
+        }
+
+        String encodedCertificationNumber = certificationEntity.getCertificationNumber();
+
+        boolean isMatched = certificationEntity.getEmail().equals(email) && bCryptPasswordEncoder.matches(certificationNumber, encodedCertificationNumber);
+
+        if(!isMatched) {
+            throw new CustomException(ErrorCode.CERTIFICATION_FAILED);
+        }
     }
 }

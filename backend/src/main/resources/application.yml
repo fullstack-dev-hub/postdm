@@ -19,6 +19,8 @@ springdoc:
   cache:
     disabled: true
 
+  override-with-generic-response: false
+
 management:
   endpoint:
     health:

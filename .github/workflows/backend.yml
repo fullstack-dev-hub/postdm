@@ -74,13 +74,13 @@ jobs:
             aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin ${{ secrets.AWS_ECR_REPOSITORY }}
             
             echo "PULLING LATEST IMAGE..."
-            sudo docker pull ${{ secrets.AWS_ECR_REPOSITORY }}:latest
+            docker pull ${{ secrets.AWS_ECR_REPOSITORY }}:latest
             
             echo "STOPPING AND REMOVING EXISTING CONTAINERS..."
-            sudo docker-compose down --remove-orphans || true
+            sudo docker compose down --remove-orphans || true
             
             echo "REMOVING UNUSED DOCKER IMAGES..."
-            sudo docker image rm ${{ secrets.AWS_ECR_REPOSITORY }}:latest || true
+            docker image rm ${{ secrets.AWS_ECR_REPOSITORY }}:latest || true
         
             echo "UPDATING .env FILE..."
             cat <<EOF > .env
@@ -92,6 +92,6 @@ jobs:
             EOF
             
             echo "STARTING NEW CONTAINER..."
-            sudo docker-compose up -d --force-recreate
+            sudo docker compose up -d --force-recreate
             
             echo "✅ DEPLOYMENT COMPLETE!"

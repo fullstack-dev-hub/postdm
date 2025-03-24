@@ -69,29 +69,27 @@ jobs:
           key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
           port: ${{ secrets.PORT }}
           script: |
-            whoami
-            ls -l
             cd /home/${{ secrets.EC2_USERNAME }}/backend
             
+            aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin ${{ secrets.AWS_ECR_REPOSITORY }}
+            
             echo "PULLING LATEST IMAGE..."
-            sudo docker image rm ${{ secrets.AWS_ECR_REPOSITORY }}:latest || true
             sudo docker pull ${{ secrets.AWS_ECR_REPOSITORY }}:latest
             
             echo "STOPPING AND REMOVING EXISTING CONTAINERS..."
             sudo docker-compose down --remove-orphans || true
             
             echo "REMOVING UNUSED DOCKER IMAGES..."
-            sudo docker system prune -af
+            sudo docker image rm ${{ secrets.AWS_ECR_REPOSITORY }}:latest || true
         
             echo "UPDATING .env FILE..."
-            echo "MYSQL_URL=${{ secrets.MYSQL_URL }}" > .env
-            echo "MYSQL_USERNAME=${{ secrets.MYSQL_USERNAME }}" >> .env
-            echo "MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}" >> .env
-            echo "MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}" >> .env
-            echo "MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }}" >> .env
-            
-            echo "CHECKING .env FILE CONTENTS:"
-            cat .env || { echo "ERROR: .env file not created properly."; exit 1; }
+            cat <<EOF > .env
+            MYSQL_URL=${{ secrets.MYSQL_URL }}
+            MYSQL_USERNAME=${{ secrets.MYSQL_USERNAME }}
+            MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}
+            MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}
+            MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }}
+            EOF
             
             echo "STARTING NEW CONTAINER..."
             sudo docker-compose up -d --force-recreate

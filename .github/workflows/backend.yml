@@ -94,6 +94,8 @@ jobs:
             SPRING_PROFILES_ACTIVE=${{ secrets.SPRING_PROFILES_ACTIVE }}
             JWT_SECRET=${{ secrets.JWT_SECRET }}
             JWT_EXPIRATION=${{ secrets.JWT_EXPIRATION }}
+            JWT_EXPIREDMS=${{ secrets.JWT_EXPIREDMS }}
+            JWT_REFRESHEDMS=${{ secrets.JWT_REFRESHEDMS }}
             EOF
             
             echo "STARTING NEW CONTAINER..."

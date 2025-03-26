@@ -96,6 +96,10 @@ jobs:
             JWT_EXPIRATION=${{ secrets.JWT_EXPIRATION }}
             JWT_EXPIREDMS=${{ secrets.JWT_EXPIREDMS }}
             JWT_REFRESHEDMS=${{ secrets.JWT_REFRESHEDMS }}
+            SPRING_MAIL_HOST=${{ secrets.SPRING_MAIL_HOST }}
+            SPRING_MAIL_PORT=${{ secrets.SPRING_MAIL_PORT }}
+            SPRING_MAIL_USERNAME=${{ secrets.SPRING_MAIL_USERNAME }}
+            SPRING_MAIL_PASSWORD=${{ secrets.SPRING_MAIL_PASSWORD }}
             EOF
             
             echo "STARTING NEW CONTAINER..."

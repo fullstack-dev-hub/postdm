@@ -1,27 +1,38 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/solid";
 import PrimaryButton from "@/components/find/PrimaryButton";
 import InputField from "@/components/find/InputField";
 
 const FindPage = () => {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const tab = searchParams.get("tab") || "id";
-
+  
+  // ✅ URL에서 직접 `tab`을 가져오지 않고, useState로 관리
+  const [tab, setTab] = useState<"id" | "password">("id");
   const [foundId, setFoundId] = useState<string | null>(null);
   const [showVerification, setShowVerification] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
   const [verificationCode, setVerificationCode] = useState("");
   const [verificationError, setVerificationError] = useState(false);
   const [showPasswordReset, setShowPasswordReset] = useState(false);
-
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const handleTabChange = (newTab: string) => {
+  // ✅ useEffect로 URL 쿼리 파라미터를 `tab` 상태로 반영
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const currentTab = urlParams.get("tab");
+    if (currentTab === "password") {
+      setTab("password");
+    } else {
+      setTab("id");
+    }
+  }, []);
+
+  const handleTabChange = (newTab: "id" | "password") => {
+    setTab(newTab);
     router.push(`/find?tab=${newTab}`);
     setFoundId(null);
     setShowVerification(false);
@@ -29,30 +40,6 @@ const FindPage = () => {
     setVerificationCode("");
     setVerificationError(false);
     setShowPasswordReset(false);
-  };
-
-  const handleFindId = () => {
-    // 추후 연동 필요
-    setFoundId("ekdm*******");
-  };
-
-  const handleVerifyEmail = () => {
-    setShowVerification(true);
-  };
-
-  const handleConfirmVerification = () => {
-    if (verificationCode === "1234") {
-      // 추후 연동 필요, 우선 인증코드가 1234면 통과
-      setIsVerified(true);
-      setVerificationError(false);
-    } else {
-      setIsVerified(false);
-      setVerificationError(true);
-    }
-  };
-
-  const handlePasswordReset = () => {
-    setShowPasswordReset(true);
   };
 
   return (
@@ -92,25 +79,15 @@ const FindPage = () => {
                 고객님과 일치하는 아이디입니다.
               </p>
               <p className="text-xl font-semibold mt-2"> ID : {foundId}</p>
-              <PrimaryButton
-                text="로그인"
-                onClick={() => router.push("/login")}
-              />
-              <button
-                className="w-full text-sm underline mt-4"
-                onClick={() => handleTabChange("password")}
-              >
+              <PrimaryButton text="로그인" onClick={() => router.push("/login")} />
+              <button className="w-full text-sm underline mt-4" onClick={() => handleTabChange("password")}>
                 비밀번호 찾기
               </button>
             </div>
           ) : (
             <div>
-              <InputField
-                label="이메일"
-                type="email"
-                placeholder="이메일 주소 입력"
-              />
-              <PrimaryButton text="아이디 확인하기" onClick={handleFindId} />
+              <InputField label="이메일" type="email" placeholder="이메일 주소 입력" />
+              <PrimaryButton text="아이디 확인하기" onClick={() => setFoundId("ekdm*******")} />
             </div>
           )
         ) : showPasswordReset ? (
@@ -123,7 +100,6 @@ const FindPage = () => {
               onChange={(e) => setNewPassword(e.target.value)}
               helperText="*영문 + 숫자 + 특수문자 8자 이상"
             />
-
             <InputField
               label="변경 비밀번호 재확인"
               type="password"
@@ -137,15 +113,8 @@ const FindPage = () => {
           <div>
             <InputField label="아이디" type="text" placeholder="아이디 입력" />
             <div className="w-full flex items-center">
-              <InputField
-                label="이메일"
-                type="email"
-                placeholder="이메일 주소 입력"
-              >
-                <button
-                  className="font-bold px-4 py-2 bg-primary text-white rounded-md text-sm whitespace-nowrap"
-                  onClick={handleVerifyEmail}
-                >
+              <InputField label="이메일" type="email" placeholder="이메일 주소 입력">
+                <button className="font-bold px-4 py-2 bg-primary text-white rounded-md text-sm whitespace-nowrap" onClick={() => setShowVerification(true)}>
                   인증
                 </button>
               </InputField>
@@ -165,31 +134,27 @@ const FindPage = () => {
                       verificationError ? "border-red-500" : "border-gray-600"
                     }`}
                   />
-                  {isVerified && (
-                    <CheckCircleIcon className="w-6 h-6 text-green-500 flex-shrink-0 ml-2" />
-                  )}
-                  {verificationError && (
-                    <XCircleIcon className="w-6 h-6 text-red-500 flex-shrink-0 ml-2" />
-                  )}
+                  {isVerified && <CheckCircleIcon className="w-6 h-6 text-green-500 flex-shrink-0 ml-2" />}
+                  {verificationError && <XCircleIcon className="w-6 h-6 text-red-500 flex-shrink-0 ml-2" />}
                   <button
                     className="ml-2 font-bold px-4 py-2 bg-primary text-white rounded-md text-sm whitespace-nowrap"
-                    onClick={handleConfirmVerification}
+                    onClick={() => {
+                      if (verificationCode === "1234") {
+                        setIsVerified(true);
+                        setVerificationError(false);
+                      } else {
+                        setIsVerified(false);
+                        setVerificationError(true);
+                      }
+                    }}
                   >
                     확인
                   </button>
                 </div>
-                {verificationError && (
-                  <p className="text-red-500 font-semibold text-sm mt-1">
-                    * 인증번호를 다시 확인해주세요.
-                  </p>
-                )}
+                {verificationError && <p className="text-red-500 font-semibold text-sm mt-1">* 인증번호를 다시 확인해주세요.</p>}
               </div>
             )}
-            <PrimaryButton
-              text="비밀번호 재설정"
-              onClick={handlePasswordReset}
-              disabled={!isVerified}
-            />
+            <PrimaryButton text="비밀번호 재설정" onClick={() => setShowPasswordReset(true)} disabled={!isVerified} />
           </div>
         )}
       </div>

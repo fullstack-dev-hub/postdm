@@ -43,6 +43,7 @@ const FindPage = () => {
     setShowPasswordReset(false);
   };
 
+
   return (
     <div className="flex flex-col items-center w-[390px] pt-[164px] h-[844px] mx-auto p-6">
       <Title pageTitle="아이디 / 비밀번호 찾기" />
@@ -92,6 +93,13 @@ const FindPage = () => {
         ) : showPasswordReset ? (
           <div>
             <InputField
+              label="아이디"
+              type="text"
+              placeholder="아이디 입력"
+              disabled
+            />
+
+            <InputField
               label="변경 비밀번호"
               type="password"
               placeholder="새로 변경할 비밀번호를 입력해주세요"
@@ -110,7 +118,11 @@ const FindPage = () => {
           </div>
         ) : (
           <div>
-            <InputField label="아이디" type="text" placeholder="아이디 입력" />
+            <InputField
+              label="아이디"
+              type="text"
+              placeholder="아이디 입력"
+            />
             <div className="w-full flex items-center">
               <InputField label="이메일" type="email" placeholder="이메일 주소 입력">
                 <button className="font-bold px-4 py-2 bg-primary text-white rounded-md text-sm whitespace-nowrap" onClick={() => setShowVerification(true)}>

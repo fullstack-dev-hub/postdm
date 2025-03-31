@@ -6,6 +6,7 @@ export interface InputFieldProps {
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   children?: React.ReactNode;
   helperText?: string;
+  disabled?: boolean;
 }
 
 export interface PrimaryButtonProps {

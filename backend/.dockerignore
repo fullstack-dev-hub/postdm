@@ -1,0 +1,7 @@
+.git
+.gradle
+node_modules
+build/
+target
+Dockerfile
+README.md

@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import axios from "@/utils/axios";
 import Title from "@/components/Title";
 const LoginPage = () => {
   const [id, setId] = useState("");
@@ -8,13 +9,28 @@ const LoginPage = () => {
   const [error, setError] = useState(false);
   const router = useRouter();
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!id || !password) {
       setError(true);
       return;
     }
-    setError(false);
-    console.log("로그인 요청"); // 추후 서버 연동
+    try {
+      const res = await axios.post("/api/v1/auth/sign-in", {
+        username: id,
+        password,
+      });
+      if (res.data.status === 200) {
+        const { accessToken, role } = res.data.data;
+        localStorage.setItem("accessToken", accessToken);
+        localStorage.setItem("userRole", role);
+        router.push("/");
+      } else {
+        setError(true);
+      }
+    } catch (err) {
+      console.error("Login failed:", err);
+      setError(true);
+    }
   };
 
   return (
@@ -65,7 +81,9 @@ const LoginPage = () => {
       </button>
 
       <div className="w-full flex justify-between mt-4 text-xs text-gray-700">
-        <button className="underline">회원가입</button>
+        <button className="underline" onClick={() => router.push("/signup")}>
+          회원가입
+        </button>
         <div className="flex gap-4">
           <button
             className="underline"

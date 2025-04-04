@@ -7,4 +7,18 @@ const instance = axios.create({
   },
 });
 
+// accessToken 인터셉터
+instance.interceptors.request.use(
+  (config) => {
+    if (typeof window !== "undefined") {
+      const token = localStorage.getItem("accessToken");
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
 export default instance;

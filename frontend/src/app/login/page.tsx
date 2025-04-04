@@ -3,11 +3,24 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "@/utils/axios";
 import Title from "@/components/Title";
+import { motion, AnimatePresence } from "framer-motion";
+import confetti from "canvas-confetti";
 const LoginPage = () => {
   const [id, setId] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const router = useRouter();
+
+  const fireConfetti = () => {
+    confetti({
+      particleCount: 200,
+      spread: 120,
+      origin: { y: 0.6 },
+      scalar: 0.8,
+      colors: ["#A3C4F3", "#FFB6B9", "#FFDAC1", "#E2F0CB", "#B5EAD7"],
+    });
+  };
 
   const handleLogin = async () => {
     if (!id || !password) {
@@ -23,7 +36,12 @@ const LoginPage = () => {
         const { accessToken, role } = res.data.data;
         localStorage.setItem("accessToken", accessToken);
         localStorage.setItem("userRole", role);
-        router.push("/");
+        setShowModal(true);
+        fireConfetti();
+        setTimeout(() => {
+          setShowModal(false);
+          router.push("/");
+        }, 2000);
       } else {
         setError(true);
       }
@@ -34,7 +52,7 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="flex flex-col items-center w-[390px] pt-[164px] h-[844px] mx-auto p-6">
+    <div className="flex flex-col items-center w-[390px] pt-[164px] h-[844px] mx-auto p-6 relative overflow-hidden">
       <Title pageTitle="로그인" />
 
       <div className="w-full mt-8">
@@ -99,6 +117,27 @@ const LoginPage = () => {
           </button>
         </div>
       </div>
+
+      <AnimatePresence>
+        {showModal && (
+          <motion.div
+            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="bg-white p-6 rounded-lg shadow-lg text-center"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <p className="text-lg font-semibold">로그인에 성공했습니다!</p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

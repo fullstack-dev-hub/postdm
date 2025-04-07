@@ -6,12 +6,12 @@ import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/solid";
 import PrimaryButton from "@/components/find/PrimaryButton";
 import InputField from "@/components/find/InputField";
 import Title from "@/components/Title";
+import axios from "@/utils/axios";
 
 const FindPage = () => {
   const router = useRouter();
-  
-  // ✅ URL에서 직접 `tab`을 가져오지 않고, useState로 관리
   const [tab, setTab] = useState<"id" | "password">("id");
+  const [email, setEmail] = useState("");
   const [foundId, setFoundId] = useState<string | null>(null);
   const [showVerification, setShowVerification] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
@@ -21,7 +21,6 @@ const FindPage = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  // ✅ useEffect로 URL 쿼리 파라미터를 `tab` 상태로 반영
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const currentTab = urlParams.get("tab");
@@ -43,6 +42,19 @@ const FindPage = () => {
     setShowPasswordReset(false);
   };
 
+  const handleFindId = async () => {
+    try {
+      const res = await axios.post("/api/v1/member/find-userId", { email });
+      if (res.data.status === 200) {
+        setFoundId(res.data.data);
+      } else {
+        alert(res.data.message || "아이디를 찾을 수 없습니다.");
+      }
+    } catch (err) {
+      console.error("아이디 찾기 실패", err);
+      alert("아이디 찾기 중 오류가 발생했습니다.");
+    }
+  };
 
   return (
     <div className="flex flex-col items-center w-[390px] pt-[164px] h-[844px] mx-auto p-6">
@@ -79,15 +91,27 @@ const FindPage = () => {
                 고객님과 일치하는 아이디입니다.
               </p>
               <p className="text-xl font-semibold mt-2"> ID : {foundId}</p>
-              <PrimaryButton text="로그인" onClick={() => router.push("/login")} />
-              <button className="w-full text-sm underline mt-4" onClick={() => handleTabChange("password")}>
+              <PrimaryButton
+                text="로그인"
+                onClick={() => router.push("/login")}
+              />
+              <button
+                className="w-full text-sm underline mt-4"
+                onClick={() => handleTabChange("password")}
+              >
                 비밀번호 찾기
               </button>
             </div>
           ) : (
             <div>
-              <InputField label="이메일" type="email" placeholder="이메일 주소 입력" />
-              <PrimaryButton text="아이디 확인하기" onClick={() => setFoundId("ekdm*******")} />
+              <InputField
+                label="이메일"
+                type="email"
+                placeholder="이메일 주소 입력"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              <PrimaryButton text="아이디 확인하기" onClick={handleFindId} />
             </div>
           )
         ) : showPasswordReset ? (
@@ -118,14 +142,19 @@ const FindPage = () => {
           </div>
         ) : (
           <div>
-            <InputField
-              label="아이디"
-              type="text"
-              placeholder="아이디 입력"
-            />
+            <InputField label="아이디" type="text" placeholder="아이디 입력" />
             <div className="w-full flex items-center">
-              <InputField label="이메일" type="email" placeholder="이메일 주소 입력">
-                <button className="font-bold px-4 py-2 bg-primary text-white rounded-md text-sm whitespace-nowrap" onClick={() => setShowVerification(true)}>
+              <InputField
+                label="이메일"
+                type="email"
+                placeholder="이메일 주소 입력"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              >
+                <button
+                  className="font-bold px-4 py-2 bg-primary text-white rounded-md text-sm whitespace-nowrap"
+                  onClick={() => setShowVerification(true)}
+                >
                   인증
                 </button>
               </InputField>
@@ -145,8 +174,12 @@ const FindPage = () => {
                       verificationError ? "border-red-500" : "border-gray-600"
                     }`}
                   />
-                  {isVerified && <CheckCircleIcon className="w-6 h-6 text-green-500 flex-shrink-0 ml-2" />}
-                  {verificationError && <XCircleIcon className="w-6 h-6 text-red-500 flex-shrink-0 ml-2" />}
+                  {isVerified && (
+                    <CheckCircleIcon className="w-6 h-6 text-green-500 flex-shrink-0 ml-2" />
+                  )}
+                  {verificationError && (
+                    <XCircleIcon className="w-6 h-6 text-red-500 flex-shrink-0 ml-2" />
+                  )}
                   <button
                     className="ml-2 font-bold px-4 py-2 bg-primary text-white rounded-md text-sm whitespace-nowrap"
                     onClick={() => {
@@ -162,10 +195,18 @@ const FindPage = () => {
                     확인
                   </button>
                 </div>
-                {verificationError && <p className="text-red-500 font-semibold text-sm mt-1">* 인증번호를 다시 확인해주세요.</p>}
+                {verificationError && (
+                  <p className="text-red-500 font-semibold text-sm mt-1">
+                    * 인증번호를 다시 확인해주세요.
+                  </p>
+                )}
               </div>
             )}
-            <PrimaryButton text="비밀번호 재설정" onClick={() => setShowPasswordReset(true)} disabled={!isVerified} />
+            <PrimaryButton
+              text="비밀번호 재설정"
+              onClick={() => setShowPasswordReset(true)}
+              disabled={!isVerified}
+            />
           </div>
         )}
       </div>

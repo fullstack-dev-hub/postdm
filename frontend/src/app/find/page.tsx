@@ -11,6 +11,7 @@ import axios from "@/utils/axios";
 const FindPage = () => {
   const router = useRouter();
   const [tab, setTab] = useState<"id" | "password">("id");
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [foundId, setFoundId] = useState<string | null>(null);
   const [showVerification, setShowVerification] = useState(false);
@@ -45,7 +46,7 @@ const FindPage = () => {
   const handleFindId = async () => {
     try {
       const res = await axios.post("/api/v1/member/find-userId", { email });
-      if (res.data.status === 200) {
+      if (res.data.status === 0) {
         setFoundId(res.data.data);
       } else {
         alert(res.data.message || "아이디를 찾을 수 없습니다.");
@@ -53,6 +54,62 @@ const FindPage = () => {
     } catch (err) {
       console.error("아이디 찾기 실패", err);
       alert("아이디 찾기 중 오류가 발생했습니다.");
+    }
+  };
+
+  const handleSendResetEmail = async () => {
+    try {
+      const res = await axios.post("/api/v1/email/reset-certification", {
+        username,
+        email,
+      });
+      if (res.data.status === 200) {
+        setShowVerification(true);
+      } else {
+        alert(res.data.message || "이메일 인증 요청 실패");
+      }
+    } catch (err) {
+      console.error("이메일 전송 실패", err);
+    }
+  };
+
+  const handleCheckResetCode = async () => {
+    try {
+      const res = await axios.post("/api/v1/member/check-certification", {
+        username,
+        email,
+        certificationNumber: verificationCode,
+      });
+      if (res.data.status === 200) {
+        setIsVerified(true);
+        setVerificationError(false);
+      } else {
+        setIsVerified(false);
+        setVerificationError(true);
+      }
+    } catch (err) {
+      console.error("인증 실패", err);
+      setIsVerified(false);
+      setVerificationError(true);
+    }
+  };
+
+  const handleResetPassword = async () => {
+    try {
+      const res = await axios.post("/api/v1/member/reset-password", {
+        username,
+        password: newPassword,
+        confirmPassword,
+      });
+      if (res.data.status === 200) {
+        alert("비밀번호가 성공적으로 변경되었습니다.");
+        router.push("/login");
+      } else {
+        alert(res.data.message || "비밀번호 변경 실패");
+      }
+    } catch (err) {
+      console.error("비밀번호 변경 실패", err);
+      alert("비밀번호 변경 중 오류가 발생했습니다.");
     }
   };
 
@@ -120,9 +177,9 @@ const FindPage = () => {
               label="아이디"
               type="text"
               placeholder="아이디 입력"
+              value={username}
               disabled
             />
-
             <InputField
               label="변경 비밀번호"
               type="password"
@@ -138,11 +195,20 @@ const FindPage = () => {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
             />
-            <PrimaryButton text="비밀번호 변경하기" />
+            <PrimaryButton
+              text="비밀번호 변경하기"
+              onClick={handleResetPassword}
+            />
           </div>
         ) : (
           <div>
-            <InputField label="아이디" type="text" placeholder="아이디 입력" />
+            <InputField
+              label="아이디"
+              type="text"
+              placeholder="아이디 입력"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
             <div className="w-full flex items-center">
               <InputField
                 label="이메일"
@@ -153,7 +219,7 @@ const FindPage = () => {
               >
                 <button
                   className="font-bold px-4 py-2 bg-primary text-white rounded-md text-sm whitespace-nowrap"
-                  onClick={() => setShowVerification(true)}
+                  onClick={handleSendResetEmail}
                 >
                   인증
                 </button>
@@ -182,15 +248,7 @@ const FindPage = () => {
                   )}
                   <button
                     className="ml-2 font-bold px-4 py-2 bg-primary text-white rounded-md text-sm whitespace-nowrap"
-                    onClick={() => {
-                      if (verificationCode === "1234") {
-                        setIsVerified(true);
-                        setVerificationError(false);
-                      } else {
-                        setIsVerified(false);
-                        setVerificationError(true);
-                      }
-                    }}
+                    onClick={handleCheckResetCode}
                   >
                     확인
                   </button>

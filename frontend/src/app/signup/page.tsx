@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import axios from "@/utils/axios";
 import SignupInputField from "@/components/signup/SignupInputField";
 import PrivacyAgreement from "@/components/signup/PrivacyAgreement";
 import PrimaryButton from "@/components/find/PrimaryButton";
@@ -29,10 +30,15 @@ const Signup = () => {
   >(null);
   const [isPrivacyChecked, setIsPrivacyChecked] = useState(false);
 
-  const handleCheckUsername = () => {
-    // 아이디 중복 확인 -> 추후 서버 연동
-    // 예제: "testuser"는 이미 사용 중
-    setIsUsernameAvailable(username !== "testuser");
+  const handleCheckUsername = async () => {
+    try {
+      const res = await axios.post("/api/v1/auth/id-check", { username });
+      console.log("중복 확인 응답:", res.data);
+      setIsUsernameAvailable(res.data.status === 200);
+    } catch (error) {
+      console.error("Username check failed", error);
+      setIsUsernameAvailable(false);
+    }
   };
 
   const validatePassword = (value: string) => {
@@ -47,16 +53,59 @@ const Signup = () => {
     setIsPasswordMatch(password === value);
   };
 
-  const handleSendVerification = () => {
-    // 이메일 인증 요청 -> 추후 서버 연동
-    setShowVerificationField(true);
-    // 예제: "test@example.com"은 이미 사용 중
-    setIsEmailAvailable(email !== "test@example.com");
+  const handleSendVerification = async () => {
+    try {
+      const res = await axios.post("/api/v1/email/email-certification", {
+        username,
+        email,
+      });
+      if (res.data.status === 200) {
+        setShowVerificationField(true);
+        setIsEmailAvailable(true);
+      } else {
+        setIsEmailAvailable(false);
+        alert(res.data.message || "이메일 인증 요청 실패");
+      }
+    } catch (error) {
+      console.error("Email verification request failed", error);
+      setIsEmailAvailable(false);
+    }
   };
 
-  const handleVerifyCode = () => {
-    // 인증번호 확인 -> 추후 서버 연동
-    setIsVerificationSuccess(verificationCode === "123456");
+  const handleVerifyCode = async () => {
+    try {
+      const res = await axios.post("/api/v1/auth/check-certification", {
+        username,
+        email,
+        certificationNumber: verificationCode,
+      });
+      setIsVerificationSuccess(res.data.status === 200);
+    } catch (error) {
+      console.error("Verification failed", error);
+      setIsVerificationSuccess(false);
+    }
+  };
+
+  const handleSignup = async () => {
+    try {
+      const res = await axios.post("/api/v1/auth/sign-up", {
+        nickname: name,
+        username,
+        password,
+        confirmPassword,
+        email,
+        phone,
+        certificationNumber: verificationCode,
+      });
+      if (res.data.status === 200) {
+        alert("회원가입 완료");
+      } else {
+        alert(res.data.message || "회원가입 실패");
+      }
+    } catch (error) {
+      console.error("Signup error", error);
+      alert("회원가입 중 오류가 발생했습니다");
+    }
   };
 
   const isSignupDisabled =
@@ -67,10 +116,10 @@ const Signup = () => {
     !name ||
     !phone ||
     !isPrivacyChecked ||
-    isUsernameAvailable === false ||
-    isEmailAvailable === false ||
+    isUsernameAvailable !== true ||
     !isPasswordValid ||
-    !isPasswordMatch;
+    !isPasswordMatch ||
+    !isVerificationSuccess;
 
   return (
     <div className="max-w-md mx-auto p-6 pt-[164px]">
@@ -81,7 +130,10 @@ const Signup = () => {
         type="text"
         placeholder="아이디 입력"
         value={username}
-        onChange={(e) => setUsername(e.target.value)}
+        onChange={(e) => {
+          setUsername(e.target.value);
+          setIsUsernameAvailable(null);
+        }}
         buttonText="중복 확인"
         onButtonClick={handleCheckUsername}
         success={isUsernameAvailable === true}
@@ -120,9 +172,9 @@ const Signup = () => {
         onChange={(e) => setEmail(e.target.value)}
         buttonText="인증"
         onButtonClick={handleSendVerification}
-        success={isEmailAvailable === true}
         error={isEmailAvailable === false}
         errorText="* 이미 사용 중인 이메일입니다."
+        success={isEmailAvailable === true}
       />
 
       {showVerificationField && (
@@ -163,7 +215,7 @@ const Signup = () => {
 
       <PrimaryButton
         text="회원가입"
-        onClick={() => alert("회원가입 완료")}
+        onClick={handleSignup}
         disabled={isSignupDisabled}
       />
     </div>

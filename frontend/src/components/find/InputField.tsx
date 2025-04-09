@@ -10,6 +10,7 @@ const InputField = ({
   onChange,
   children,
   helperText,
+  disabled = false,
 }: InputFieldProps) => (
   <div className="w-full mt-4">
     <div className="flex items-center space-x-2">
@@ -26,7 +27,14 @@ const InputField = ({
         placeholder={placeholder}
         value={value}
         onChange={onChange}
-        className="flex-grow border-b border-gray-600 outline-none py-2 text-lg mt-2"
+        disabled={disabled}
+        className={`flex-grow border-b outline-none py-2 text-lg mt-2
+          ${
+            disabled
+              ? "bg-gray-100 text-gray-500 cursor-not-allowed"
+              : "border-gray-600"
+          }
+        `}
       />
       {children && <div className="ml-2">{children}</div>}
     </div>

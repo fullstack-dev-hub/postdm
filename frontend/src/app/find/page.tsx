@@ -5,12 +5,14 @@ import { useState, useEffect } from "react";
 import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/solid";
 import PrimaryButton from "@/components/find/PrimaryButton";
 import InputField from "@/components/find/InputField";
+import Title from "@/components/Title";
+import axios from "@/utils/axios";
 
 const FindPage = () => {
   const router = useRouter();
-  
-  // ✅ URL에서 직접 `tab`을 가져오지 않고, useState로 관리
   const [tab, setTab] = useState<"id" | "password">("id");
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [foundId, setFoundId] = useState<string | null>(null);
   const [showVerification, setShowVerification] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
@@ -20,7 +22,6 @@ const FindPage = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  // ✅ useEffect로 URL 쿼리 파라미터를 `tab` 상태로 반영
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const currentTab = urlParams.get("tab");
@@ -42,11 +43,79 @@ const FindPage = () => {
     setShowPasswordReset(false);
   };
 
+  const handleFindId = async () => {
+    try {
+      const res = await axios.post("/api/v1/member/find-userId", { email });
+      if (res.data.status === 0) {
+        setFoundId(res.data.data);
+      } else {
+        alert(res.data.message || "아이디를 찾을 수 없습니다.");
+      }
+    } catch (err) {
+      console.error("아이디 찾기 실패", err);
+      alert("아이디 찾기 중 오류가 발생했습니다.");
+    }
+  };
+
+  const handleSendResetEmail = async () => {
+    try {
+      const res = await axios.post("/api/v1/email/reset-certification", {
+        username,
+        email,
+      });
+      if (res.data.status === 200) {
+        setShowVerification(true);
+      } else {
+        alert(res.data.message || "이메일 인증 요청 실패");
+      }
+    } catch (err) {
+      console.error("이메일 전송 실패", err);
+    }
+  };
+
+  const handleCheckResetCode = async () => {
+    try {
+      const res = await axios.post("/api/v1/member/check-certification", {
+        username,
+        email,
+        certificationNumber: verificationCode,
+      });
+      if (res.data.status === 200) {
+        setIsVerified(true);
+        setVerificationError(false);
+      } else {
+        setIsVerified(false);
+        setVerificationError(true);
+      }
+    } catch (err) {
+      console.error("인증 실패", err);
+      setIsVerified(false);
+      setVerificationError(true);
+    }
+  };
+
+  const handleResetPassword = async () => {
+    try {
+      const res = await axios.post("/api/v1/member/reset-password", {
+        username,
+        password: newPassword,
+        confirmPassword,
+      });
+      if (res.data.status === 200) {
+        alert("비밀번호가 성공적으로 변경되었습니다.");
+        router.push("/login");
+      } else {
+        alert(res.data.message || "비밀번호 변경 실패");
+      }
+    } catch (err) {
+      console.error("비밀번호 변경 실패", err);
+      alert("비밀번호 변경 중 오류가 발생했습니다.");
+    }
+  };
+
   return (
-    <div className="flex flex-col items-center w-[390px] h-[844px] mx-auto p-6">
-      <div className="w-full h-16 border-b border-gray-400 flex items-center justify-center text-gray-500">
-        상단바 공간
-      </div>
+    <div className="flex flex-col items-center w-[390px] pt-[164px] h-[844px] mx-auto p-6">
+      <Title pageTitle="아이디 / 비밀번호 찾기" />
 
       <div className="w-full flex border-b">
         <button
@@ -79,19 +148,38 @@ const FindPage = () => {
                 고객님과 일치하는 아이디입니다.
               </p>
               <p className="text-xl font-semibold mt-2"> ID : {foundId}</p>
-              <PrimaryButton text="로그인" onClick={() => router.push("/login")} />
-              <button className="w-full text-sm underline mt-4" onClick={() => handleTabChange("password")}>
+              <PrimaryButton
+                text="로그인"
+                onClick={() => router.push("/login")}
+              />
+              <button
+                className="w-full text-sm underline mt-4"
+                onClick={() => handleTabChange("password")}
+              >
                 비밀번호 찾기
               </button>
             </div>
           ) : (
             <div>
-              <InputField label="이메일" type="email" placeholder="이메일 주소 입력" />
-              <PrimaryButton text="아이디 확인하기" onClick={() => setFoundId("ekdm*******")} />
+              <InputField
+                label="이메일"
+                type="email"
+                placeholder="이메일 주소 입력"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              <PrimaryButton text="아이디 확인하기" onClick={handleFindId} />
             </div>
           )
         ) : showPasswordReset ? (
           <div>
+            <InputField
+              label="아이디"
+              type="text"
+              placeholder="아이디 입력"
+              value={username}
+              disabled
+            />
             <InputField
               label="변경 비밀번호"
               type="password"
@@ -107,14 +195,32 @@ const FindPage = () => {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
             />
-            <PrimaryButton text="비밀번호 변경하기" />
+            <PrimaryButton
+              text="비밀번호 변경하기"
+              onClick={handleResetPassword}
+            />
           </div>
         ) : (
           <div>
-            <InputField label="아이디" type="text" placeholder="아이디 입력" />
+            <InputField
+              label="아이디"
+              type="text"
+              placeholder="아이디 입력"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
             <div className="w-full flex items-center">
-              <InputField label="이메일" type="email" placeholder="이메일 주소 입력">
-                <button className="font-bold px-4 py-2 bg-primary text-white rounded-md text-sm whitespace-nowrap" onClick={() => setShowVerification(true)}>
+              <InputField
+                label="이메일"
+                type="email"
+                placeholder="이메일 주소 입력"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              >
+                <button
+                  className="font-bold px-4 py-2 bg-primary text-white rounded-md text-sm whitespace-nowrap"
+                  onClick={handleSendResetEmail}
+                >
                   인증
                 </button>
               </InputField>
@@ -134,27 +240,31 @@ const FindPage = () => {
                       verificationError ? "border-red-500" : "border-gray-600"
                     }`}
                   />
-                  {isVerified && <CheckCircleIcon className="w-6 h-6 text-green-500 flex-shrink-0 ml-2" />}
-                  {verificationError && <XCircleIcon className="w-6 h-6 text-red-500 flex-shrink-0 ml-2" />}
+                  {isVerified && (
+                    <CheckCircleIcon className="w-6 h-6 text-green-500 flex-shrink-0 ml-2" />
+                  )}
+                  {verificationError && (
+                    <XCircleIcon className="w-6 h-6 text-red-500 flex-shrink-0 ml-2" />
+                  )}
                   <button
                     className="ml-2 font-bold px-4 py-2 bg-primary text-white rounded-md text-sm whitespace-nowrap"
-                    onClick={() => {
-                      if (verificationCode === "1234") {
-                        setIsVerified(true);
-                        setVerificationError(false);
-                      } else {
-                        setIsVerified(false);
-                        setVerificationError(true);
-                      }
-                    }}
+                    onClick={handleCheckResetCode}
                   >
                     확인
                   </button>
                 </div>
-                {verificationError && <p className="text-red-500 font-semibold text-sm mt-1">* 인증번호를 다시 확인해주세요.</p>}
+                {verificationError && (
+                  <p className="text-red-500 font-semibold text-sm mt-1">
+                    * 인증번호를 다시 확인해주세요.
+                  </p>
+                )}
               </div>
             )}
-            <PrimaryButton text="비밀번호 재설정" onClick={() => setShowPasswordReset(true)} disabled={!isVerified} />
+            <PrimaryButton
+              text="비밀번호 재설정"
+              onClick={() => setShowPasswordReset(true)}
+              disabled={!isVerified}
+            />
           </div>
         )}
       </div>

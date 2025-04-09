@@ -1,8 +1,8 @@
-import React from 'react';
-import Image from 'next/image';
+import React from "react";
+import Image from "next/image";
 
 interface TitleProps {
-  pageTitle: string;  // 페이지 이름을 props로 받습니다
+  pageTitle: string; // 페이지 이름을 props로 받습니다
 }
 
 const Title = ({ pageTitle }: TitleProps) => {
@@ -18,11 +18,13 @@ const Title = ({ pageTitle }: TitleProps) => {
           className="object-contain"
         />
       </div>
-      
+
       {/* Page title */}
-      <h1 className="absolute left-1/2 top-[24px] -translate-x-1/2 
+      <h1
+        className="absolute left-1/2 top-[24px] -translate-x-1/2 
                      font-inter font-semibold text-[20px] leading-[24px] 
-                     tracking-[-0.025em] text-black w-[95px] text-center">
+                     tracking-[-0.025em] text-black w-auto text-center"
+      >
         {pageTitle}
       </h1>
     </div>

@@ -118,4 +118,16 @@ public class JwtProvider { // JWT 발급을 위한 Provider
         // Spring Security에서 Authentication 객체의 principal을 Member 객체로 저장
         return new UsernamePasswordAuthenticationToken(member, "", authorities);
     }
+
+    // JWT 토큰 만료 시간 반환
+    public long getExpiration(String token) {
+        Claims claims = Jwts.parser()
+                .verifyWith(secretKey)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+
+        Date expiration = claims.getExpiration();
+        return expiration.getTime() - System.currentTimeMillis();
+    }
 }

@@ -60,7 +60,7 @@ class LogoutIntegrationTest {
         // 테스트용 사용자 등록
         Member member = Member.builder()
                 .username("홍길동")
-                .password(encodedPassword) // 실제 서비스에서 bcrypt 처리 필요
+                .password(encodedPassword)
                 .email("test@test.com")
                 .role(MemberRole.MEMBER)
                 .build();

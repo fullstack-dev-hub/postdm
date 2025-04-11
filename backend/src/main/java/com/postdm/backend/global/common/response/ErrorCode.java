@@ -19,7 +19,7 @@ public enum ErrorCode {
     SIGN_IN_FAILED(HttpStatus.UNAUTHORIZED, "아이디 또는 비밀번호가 잘못되었습니다."),
 
     // 로그아웃 관련
-    ALREADY_SIGN_OUT(HttpStatus.BAD_REQUEST, "이미 로그아웃된 토큰입니다."),
+    ALREADY_SIGN_OUT(HttpStatus.UNAUTHORIZED, "이미 로그아웃된 토큰입니다."),
 
     // 아이디 찾기 및 비밀번호 재설정 관련
     NOT_FOUND_EMAIL(HttpStatus.NOT_FOUND, "존재하지 않는 이메일 입니다."),

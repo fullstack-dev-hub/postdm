@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Auth API", description = "회원가입 및 로그인 API")
 @RestController
@@ -77,4 +78,15 @@ public class AuthController { // 로그인 및 회원 가입 컨트롤러
         return new ResponseTemplate<>(HttpStatus.OK, "로그인 성공", token);
     }
 
+    @Operation(summary = "로그아웃 컨트롤러", description = "로그아웃을 요청하는 컨트롤러 입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공"),
+    })
+    @PostMapping("/sign-out") // 로그아웃 요청
+    public ResponseTemplate<?> singOut(@RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.substring(7);
+        authService.signOut(token);
+
+        return new ResponseTemplate<>(HttpStatus.OK, "로그아웃 성공", token);
+    }
 }

@@ -1,6 +1,10 @@
 package com.postdm.backend.global.jwt.filter;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.postdm.backend.domain.auth.application.TokenBlacklistService;
+import com.postdm.backend.global.common.response.ErrorCode;
+import com.postdm.backend.global.common.response.ErrorResponse;
 import com.postdm.backend.global.jwt.util.JwtProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -21,6 +25,8 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter { // JWT 필터. 해당 필터를 통해 JWT가 유효한지 판단
 
     private final JwtProvider jwtProvider;
+    private final TokenBlacklistService tokenBlacklistService;
+    private final ObjectMapper objectMapper;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -28,6 +34,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter { // JWT 필�
         String token = resolveToken(request);
 
         if (token != null && jwtProvider.validateToken(token)) {
+            // 블랙리스트에 있는지 확인
+            if (tokenBlacklistService.isBlacklisted(token)) {
+                log.warn("로그아웃된 토큰으로 접근 시도됨: {}", token);
+
+                ErrorCode errorCode = ErrorCode.ALREADY_SIGN_OUT;
+                ErrorResponse errorResponse = new ErrorResponse(errorCode);
+
+                response.setStatus(errorCode.getHttpStatus().value());
+                response.setContentType("application/json;charset=UTF-8");
+                response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
+                return;
+            }
+
             Authentication auth = jwtProvider.getAuthentication(token); // 사용자 추출
             SecurityContextHolder.getContext().setAuthentication(auth); // SecurityContextHolder에 사용자 등록
         }

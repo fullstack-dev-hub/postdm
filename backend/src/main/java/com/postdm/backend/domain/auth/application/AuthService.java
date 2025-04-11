@@ -25,6 +25,7 @@ public class AuthService { // 로그인 및 회원가입 서비스
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JwtProvider jwtProvider;
     private final int refreshedMS;
+    private final TokenBlacklistService tokenBlacklistService;
 
     // 생성자 주입 방식
     public AuthService(
@@ -32,12 +33,14 @@ public class AuthService { // 로그인 및 회원가입 서비스
             CertificationRepository certificationRepository,
             BCryptPasswordEncoder bCryptPasswordEncoder,
             JwtProvider jwtProvider,
-            @Value("${jwt.expiredMS}") int refreshedMS) {
+            @Value("${jwt.expiredMS}") int refreshedMS,
+            TokenBlacklistService tokenBlacklistService) {
         this.memberRepository = memberRepository;
         this.certificationRepository = certificationRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.jwtProvider = jwtProvider;
         this.refreshedMS = refreshedMS;
+        this.tokenBlacklistService = tokenBlacklistService;
     }
 
 
@@ -138,4 +141,12 @@ public class AuthService { // 로그인 및 회원가입 서비스
         return cookie;
     }
 
+    public void signOut(String accessToken) {
+        long expireMillis = jwtProvider.getExpiration(accessToken);
+        boolean isNewlySaved = tokenBlacklistService.saveIfNotExists(accessToken, expireMillis);
+
+        if (!isNewlySaved) {
+            throw new CustomException(ErrorCode.ALREADY_SIGN_OUT);
+        }
+    }
 }

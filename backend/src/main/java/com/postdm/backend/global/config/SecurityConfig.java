@@ -2,6 +2,7 @@ package com.postdm.backend.global.config;
 
 import com.postdm.backend.global.jwt.filter.JwtAuthenticationFilter;
 import com.postdm.backend.global.jwt.util.JwtProvider;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,11 +21,14 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.List;
 
 @Configuration
+@RequiredArgsConstructor
 @EnableWebSecurity
 public class SecurityConfig { // 시큐리티 설정을 위한 Config
 
-    @Autowired
-    private JwtProvider jwtProvider;
+//    @Autowired
+//    private JwtProvider jwtProvider;
+
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -60,7 +64,7 @@ public class SecurityConfig { // 시큐리티 설정을 위한 Config
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)); // 세션 비활성화
 
         http
-                .addFilterBefore(new JwtAuthenticationFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class); // JWT 토큰 필터
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // JWT 토큰 필터
 
 
         return http.build();

@@ -5,9 +5,11 @@ import Image from "next/image";
 import Link from "next/link";
 import axios from "@/utils/axios";
 import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 
 const Header = () => {
   const [isNavOpen, setIsNavOpen] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
   const router = useRouter();
 
   const toggleNav = () => {
@@ -28,7 +30,11 @@ const Header = () => {
       );
       localStorage.removeItem("accessToken");
       localStorage.removeItem("userRole");
-      router.push("/login");
+      setShowLogoutModal(true);
+      setTimeout(() => {
+        setShowLogoutModal(false);
+        router.push("/login");
+      }, 1500);
     } catch (err) {
       console.error("로그아웃 실패:", err);
     }
@@ -174,6 +180,27 @@ const Header = () => {
           </div>
         </div>
       )}
+
+      <AnimatePresence>
+        {showLogoutModal && (
+          <motion.div
+            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-[80]"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="bg-white px-6 py-4 rounded-lg shadow-lg text-center"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <p className="text-lg font-semibold">로그아웃되었습니다.</p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 };

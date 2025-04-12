@@ -6,6 +6,9 @@ import SignupInputField from "@/components/signup/SignupInputField";
 import PrivacyAgreement from "@/components/signup/PrivacyAgreement";
 import PrimaryButton from "@/components/find/PrimaryButton";
 import Title from "@/components/Title";
+import { useRouter } from "next/navigation";
+import { AnimatePresence, motion } from "framer-motion";
+import confetti from "canvas-confetti";
 
 const Signup = () => {
   const [username, setUsername] = useState("");
@@ -29,14 +32,25 @@ const Signup = () => {
     boolean | null
   >(null);
   const [isPrivacyChecked, setIsPrivacyChecked] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+
+  const router = useRouter();
+
+  const fireConfetti = () => {
+    confetti({
+      particleCount: 200,
+      spread: 120,
+      origin: { y: 0.6 },
+      scalar: 0.8,
+      colors: ["#A3C4F3", "#FFB6B9", "#FFDAC1", "#E2F0CB", "#B5EAD7"],
+    });
+  };
 
   const handleCheckUsername = async () => {
     try {
       const res = await axios.post("/api/v1/auth/id-check", { username });
-      console.log("중복 확인 응답:", res.data);
       setIsUsernameAvailable(res.data.status === 200);
-    } catch (error) {
-      console.error("Username check failed", error);
+    } catch {
       setIsUsernameAvailable(false);
     }
   };
@@ -66,8 +80,7 @@ const Signup = () => {
         setIsEmailAvailable(false);
         alert(res.data.message || "이메일 인증 요청 실패");
       }
-    } catch (error) {
-      console.error("Email verification request failed", error);
+    } catch {
       setIsEmailAvailable(false);
     }
   };
@@ -80,8 +93,7 @@ const Signup = () => {
         certificationNumber: verificationCode,
       });
       setIsVerificationSuccess(res.data.status === 200);
-    } catch (error) {
-      console.error("Verification failed", error);
+    } catch {
       setIsVerificationSuccess(false);
     }
   };
@@ -98,12 +110,16 @@ const Signup = () => {
         certificationNumber: verificationCode,
       });
       if (res.data.status === 200) {
-        alert("회원가입 완료");
+        setShowModal(true);
+        fireConfetti();
+        setTimeout(() => {
+          setShowModal(false);
+          router.push("/login");
+        }, 2000);
       } else {
         alert(res.data.message || "회원가입 실패");
       }
-    } catch (error) {
-      console.error("Signup error", error);
+    } catch {
       alert("회원가입 중 오류가 발생했습니다");
     }
   };
@@ -122,7 +138,7 @@ const Signup = () => {
     !isVerificationSuccess;
 
   return (
-    <div className="max-w-md mx-auto p-6 pt-[164px]">
+    <div className="max-w-md mx-auto p-6 pt-[164px] relative overflow-hidden">
       <Title pageTitle="회원가입" />
 
       <SignupInputField
@@ -218,6 +234,29 @@ const Signup = () => {
         onClick={handleSignup}
         disabled={isSignupDisabled}
       />
+
+      <AnimatePresence>
+        {showModal && (
+          <motion.div
+            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="bg-white p-6 rounded-lg shadow-lg text-center"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <p className="text-lg font-semibold">
+                회원가입이 완료되었습니다!
+              </p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

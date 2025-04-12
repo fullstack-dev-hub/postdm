@@ -48,7 +48,7 @@ const Header = () => {
   return (
     <>
       <header className="fixed top-0 left-0 right-0 h-[100px] flex items-center px-5 bg-white z-50">
-        <Link href="/home" className="flex items-center">
+        <Link href="/" className="flex items-center">
           <div className="relative w-[42px] h-[40px]">
             <Image
               src="/images/logo.svg"
@@ -133,16 +133,13 @@ const Header = () => {
             <nav className="px-5 mt-5">
               <ul className="divide-y divide-gray-200">
                 <li className="py-4">
-                  <Link
-                    href="/home"
-                    className="block w-full text-sm font-medium"
-                  >
+                  <Link href="/" className="block w-full text-sm font-medium">
                     홈
                   </Link>
                 </li>
                 <li className="py-4">
                   <Link
-                    href="/company"
+                    href="/about"
                     className="block w-full text-sm font-medium"
                   >
                     회사 소개

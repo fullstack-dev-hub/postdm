@@ -6,7 +6,7 @@ export default function ServiceCard({
   imgSrc,
   title,
   desc,
-  imageSize = 70,
+  imageSize = 60,
 }: {
   imgSrc: string;
   title: string;
@@ -14,18 +14,18 @@ export default function ServiceCard({
   imageSize?: number;
 }) {
   return (
-    <div className="bg-white rounded-xl shadow px-6 py-4 flex justify-between items-center h-[160px]">
-      <div className="text-left max-w-[60%]">
-        <h3 className="font-extrabold text-lg leading-snug mb-1">{title}</h3>
-        <p className="text-sm text-gray-600 font-medium leading-snug">{desc}</p>
+    <div className="bg-white rounded-xl shadow px-6 py-4 h-[180px] flex flex-col justify-between">
+      <h3 className="font-extrabold text-lg leading-snug mb-2">{title}</h3>
+      <div className="flex justify-between items-center flex-1">
+        <p className="text-sm font-semibold leading-snug max-w-[70%]">{desc}</p>
+        <Image
+          src={imgSrc}
+          alt={title}
+          width={imageSize}
+          height={imageSize}
+          className="object-contain ml-4"
+        />
       </div>
-      <Image
-        src={imgSrc}
-        alt={title}
-        width={imageSize}
-        height={imageSize}
-        className={`ml-4 object-contain`}
-      />
     </div>
   );
 }

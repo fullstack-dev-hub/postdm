@@ -35,17 +35,18 @@ export default function Home() {
             imgSrc="/images/1_1 주소데이터.png"
             title="주소 데이터 가공 및 출력"
             desc="고객님의 주소 데이터를 안전하게 관리하고 출력합니다."
+            imageSize={50}
           />
           <ServiceCard
             imgSrc="/images/1_2 우편물봉인.png"
             title="우편물 봉인 작업"
-            desc="우편물을 정리하게 봉인 작업을 진행합니다."
+            desc="우편물을 철저하게 봉인 작업을 진행합니다."
           />
           <ServiceCard
             imgSrc="/images/1_3 우체국접수.png"
             title="우체국 접수 대행"
             desc="고객님의 물품을 신속하게 접수하여 대행합니다."
-            imageSize={90}
+            imageSize={70}
           />
           <ServiceCard
             imgSrc="/images/1_4 택배포장.png"

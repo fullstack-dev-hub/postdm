@@ -1,24 +1,17 @@
 // app/estimate/list/page.tsx
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Title from '@/components/Title';
 import Button from '@/components/Button';
 import EstimateList from '@/components/EstimateList';
 import Pagination from '@/components/Pagination';
-
-// 견적서 항목의 타입 정의
-interface EstimateItem {
-  id: number;
-  title: string;
-  date: string;
-}
+import { useEstimates } from '@/hooks/useEstimates';
 
 export default function EstimateListPage() {
   const router = useRouter();
-  // 명시적으로 타입 지정
-  const [estimates, setEstimates] = useState<EstimateItem[]>([]);
+  const { estimates, loading, error } = useEstimates();
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6; // 페이지당 표시할 항목 수
 
@@ -26,38 +19,6 @@ export default function EstimateListPage() {
   const handleWriteClick = () => {
     router.push('/estimate/write');
   };
-
-  // 실제 구현 시 API 호출 등으로 데이터를 가져옵니다
-  useEffect(() => {
-    // 임시 데이터 (실제로는 API 호출로 대체)
-    const mockData = [
-      { id: 1, title: '안녕하세요 이번에 문의드릴게 있어서요', date: '2024.02.29' },
-      { id: 2, title: '빔프로젝트 설치 견적 문의드립니다', date: '2024.02.28' },
-      { id: 3, title: '방문 설치 문의드립니다. 가능할까요?', date: '2024.02.27' },
-      { id: 4, title: '사무실 이전 설치 관련 문의드립니다', date: '2024.02.26' },
-      { id: 5, title: '스크린 설치 관련 상담 요청드립니다', date: '2024.02.25' },
-      { id: 6, title: '프로젝터 브라켓 설치 가능한지 문의해요', date: '2024.02.24' },
-      { id: 7, title: '매립 작업 관련 문의드리고 싶습니다', date: '2024.02.23' },
-      { id: 8, title: '설치 후 AS 관련 문의드립니다.', date: '2024.02.22' },
-      { id: 9, title: '스피커 시스템 설치 견적 요청드립니다', date: '2024.02.21' },
-      { id: 10, title: '홈시어터 설치 관련 전문가 상담 부탁드려요', date: '2024.02.20' },
-      { id: 11, title: '천장형 프로젝터 설치 문의드립니다', date: '2024.02.19' },
-      { id: 12, title: '회의실 음향 시스템 설치 견적 문의', date: '2024.02.18' },
-      { id: 13, title: '강의실 영상 장비 설치 관련 문의드립니다', date: '2024.02.17' },
-      { id: 14, title: '방문 견적 가능한지 문의드립니다', date: '2024.02.16' },
-      { id: 15, title: '빔프로젝터 스크린 교체 견적 부탁드립니다', date: '2024.02.15' },
-    ];
-    
-    // 날짜 기준으로 내림차순 정렬 (최신순)
-    // 참고: 실제 API에서 가져올 때는 이미 정렬되어 있을 수 있음
-    const sortedData = [...mockData].sort((a, b) => {
-      const dateA = new Date(a.date.replace(/\./g, '-'));
-      const dateB = new Date(b.date.replace(/\./g, '-'));
-      return dateB.getTime() - dateA.getTime();
-    });
-    
-    setEstimates(sortedData);
-  }, []);
 
   // 현재 페이지에 표시할 항목들
   const currentItems = estimates.slice(
@@ -82,18 +43,45 @@ export default function EstimateListPage() {
       
       {/* 콘텐츠 영역 - 버튼 아래부터 시작 */}
       <div className="px-5 pt-[220px] pb-10">
-        {/* List Container */}
-        <EstimateList items={currentItems} />
-        
-        {/* Pagination - 항목이 1개 페이지(6개)를 초과할 때만 표시 */}
-        {totalPages > 1 && (
-          <div className="flex justify-center mt-8">
-            <Pagination 
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={setCurrentPage}
-            />
+        {/* 로딩 상태 표시 */}
+        {loading && (
+          <div className="flex justify-center items-center py-10">
+            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-gray-900"></div>
           </div>
+        )}
+        
+        {/* 에러 메시지 표시 */}
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mt-4 mb-4">
+            <p>견적서를 불러오는 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.</p>
+          </div>
+        )}
+        
+        {/* 데이터가 없을 경우 메시지 표시 */}
+        {!loading && !error && estimates.length === 0 && (
+          <div className="text-center py-10 text-gray-500">
+            <p>작성된 견적서가 없습니다.</p>
+            <p className="mt-2">견적서 작성하기 버튼을 눌러 첫 견적서를 작성해보세요.</p>
+          </div>
+        )}
+        
+        {/* 데이터가 있는 경우 목록 표시 */}
+        {!loading && !error && estimates.length > 0 && (
+          <>
+            {/* List Container */}
+            <EstimateList items={currentItems} />
+            
+            {/* Pagination - 항목이 1개 페이지(6개)를 초과할 때만 표시 */}
+            {totalPages > 1 && (
+              <div className="flex justify-center mt-8">
+                <Pagination 
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={setCurrentPage}
+                />
+              </div>
+            )}
+          </>
         )}
       </div>
     </main>

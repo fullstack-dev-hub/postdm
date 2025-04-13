@@ -1,13 +1,31 @@
 spring:
   datasource:
-    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE  # H2 인메모리 DB 사용
     driver-class-name: org.h2.Driver
     username: sa
     password:
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
-      ddl-auto: update  # 테이블 유지
-  sql:
-    init:
-      mode: always
+      ddl-auto: create-drop
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+  h2:
+    console:
+      enabled: true  # H2 웹 콘솔 활성화
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: lsmdrum99@gmail.com
+    password: dsdo blyc xbyt ksyk
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+jwt:
+  secret: LEUAmh5HSDfsVrzz5UcnwzhhNDzju6jQf080Or/Jb8H19OSVHfF9suzDN9Do3dlXEY792B7fpWhH5FWLYrAMhA==
+  expiredMS: 1800000
+  refreshedMs: 604800000

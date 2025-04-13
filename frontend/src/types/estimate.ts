@@ -13,14 +13,14 @@ export interface EstimateDetailApiResponse {
   data: EstimateData;
 }
 
+// API 응답의 실제 데이터 구조
 export interface EstimateData {
   id: number;
   title: string;
   content: string;
   createdAt: string;
-  authorName: string;
-  status?: string;
-  // 추가적인 API 응답 필드가 있다면 여기에 추가
+  memberId: number;
+  // API 문서에 나와있는 필드만 포함
 }
 
 // 프론트엔드에서 사용하는 견적서 데이터 타입
@@ -31,4 +31,22 @@ export interface Estimate {
   date: string;
   author: string;
   status?: string;
+}
+
+// 견적서 생성 요청 타입
+export interface CreateEstimateRequest {
+  content: string;
+}
+
+// 견적서 생성 응답 타입
+export interface CreateEstimateResponse {
+  status: number;
+  message: string;
+  data: {
+    id: number;
+    title: string;
+    content: string;
+    createdAt: string;
+    memberId: number;
+  };
 }

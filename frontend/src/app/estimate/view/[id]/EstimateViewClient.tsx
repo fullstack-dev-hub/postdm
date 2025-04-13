@@ -29,7 +29,7 @@ export default function EstimateViewClient({ id }: EstimateViewClientProps) {
         <Title pageTitle="견적서 상세" />
         <div className="flex flex-col justify-center items-center h-screen px-5">
           <p className="text-red-500 mb-2">{error || '견적서를 찾을 수 없습니다.'}</p>
-          {error && <p className="text-sm text-gray-500">로그인 후 이용하거나 관리자에게 문의하세요.</p>}
+          <p className="text-sm text-gray-500">잠시 후 다시 시도하거나 관리자에게 문의하세요.</p>
         </div>
       </main>
     );
@@ -49,9 +49,7 @@ export default function EstimateViewClient({ id }: EstimateViewClientProps) {
         {/* 견적 상태 표시 (있는 경우) */}
         {estimate.status && (
           <div className="mb-4">
-            <span className={`inline-block px-3 py-1 rounded-full text-sm ${
-              estimate.status.includes('대기') ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'
-            }`}>
+            <span className="inline-block px-3 py-1 rounded-full text-sm bg-green-100 text-green-800">
               {estimate.status}
             </span>
           </div>

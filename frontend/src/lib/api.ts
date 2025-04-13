@@ -11,13 +11,13 @@ const api = axios.create({
   },
 });
 
-// 요청 인터셉터 설정 (JWT 토큰 등을 여기서 처리할 수 있음)
+// 요청 인터셉터 - 모든 요청에 인증 토큰 추가
 api.interceptors.request.use(
   (config) => {
     // 로컬 스토리지에서 토큰 가져오기
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    const accessToken = localStorage.getItem('accessToken');
+    if (accessToken && config.headers) {
+      config.headers.Authorization = `Bearer ${accessToken}`;
     }
     return config;
   },
@@ -26,7 +26,7 @@ api.interceptors.request.use(
   }
 );
 
-// 응답 인터셉터 설정 (에러 처리, 리프레시 토큰 등을 여기서 처리할 수 있음)
+// 응답 인터셉터 - 토큰 만료 등의 오류 처리
 api.interceptors.response.use(
   (response) => {
     return response;
@@ -34,9 +34,16 @@ api.interceptors.response.use(
   async (error) => {
     // 401 에러(인증 실패) 처리 - 토큰 만료 등
     if (error.response && error.response.status === 401) {
-      // 토큰 갱신 로직이나 로그아웃 처리 등을 여기서 구현
-      // localStorage.removeItem('token');
-      // window.location.href = '/login';
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('userRole');
+      
+      // auth-state-changed 이벤트 발생
+      window.dispatchEvent(new Event('auth-state-changed'));
+      
+      // 클라이언트 사이드에서만 리디렉션 실행
+      if (typeof window !== 'undefined') {
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }

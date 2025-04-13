@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import axios from "@/utils/axios";
@@ -10,10 +10,48 @@ import { motion, AnimatePresence } from "framer-motion";
 const Header = () => {
   const [isNavOpen, setIsNavOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const router = useRouter();
 
+  // Check login status on every navigation bar open
+  useEffect(() => {
+    const checkLoginStatus = () => {
+      const accessToken = localStorage.getItem("accessToken");
+      setIsLoggedIn(!!accessToken);
+    };
+
+    // Initial check
+    checkLoginStatus();
+
+    // Setup event listener for localStorage changes
+    window.addEventListener("storage", checkLoginStatus);
+    
+    // Custom event listener for login/logout within the same tab
+    window.addEventListener("auth-state-changed", checkLoginStatus);
+
+    return () => {
+      window.removeEventListener("storage", checkLoginStatus);
+      window.removeEventListener("auth-state-changed", checkLoginStatus);
+    };
+  }, []);
+  
+  // Check login status every time navigation opens
+  useEffect(() => {
+    if (isNavOpen) {
+      const accessToken = localStorage.getItem("accessToken");
+      setIsLoggedIn(!!accessToken);
+    }
+  }, [isNavOpen]);
+
   const toggleNav = () => {
+    // Check login status before opening nav
+    const accessToken = localStorage.getItem("accessToken");
+    setIsLoggedIn(!!accessToken);
     setIsNavOpen(!isNavOpen);
+  };
+
+  const closeNav = () => {
+    setIsNavOpen(false);
   };
 
   const handleLogout = async () => {
@@ -30,7 +68,13 @@ const Header = () => {
       );
       localStorage.removeItem("accessToken");
       localStorage.removeItem("userRole");
+      
+      // Dispatch custom event to notify the app about auth state change
+      window.dispatchEvent(new Event("auth-state-changed"));
+      
       setShowLogoutModal(true);
+      setIsLoggedIn(false);
+      closeNav();
       setTimeout(() => {
         setShowLogoutModal(false);
         router.push("/login");
@@ -40,7 +84,12 @@ const Header = () => {
     }
   };
 
-  React.useEffect(() => {
+  const handleLogin = () => {
+    closeNav();
+    router.push("/login");
+  };
+
+  useEffect(() => {
     if (isNavOpen) {
       document.body.style.overflow = "hidden";
     } else {
@@ -139,7 +188,11 @@ const Header = () => {
             <nav className="px-5 mt-5">
               <ul className="divide-y divide-gray-200">
                 <li className="py-4">
-                  <Link href="/" className="block w-full text-sm font-medium">
+                  <Link 
+                    href="/" 
+                    className="block w-full text-sm font-medium"
+                    onClick={closeNav}
+                  >
                     홈
                   </Link>
                 </li>
@@ -147,34 +200,51 @@ const Header = () => {
                   <Link
                     href="/about"
                     className="block w-full text-sm font-medium"
+                    onClick={closeNav}
                   >
                     회사 소개
                   </Link>
                 </li>
-                <li className="py-4">
-                  <Link
-                    href="/estimate/list"
-                    className="block w-full text-sm font-medium"
-                  >
-                    나의 견적서
-                  </Link>
-                </li>
-                <li className="py-4">
-                  <Link
-                    href="/mypage"
-                    className="block w-full text-sm font-medium"
-                  >
-                    마이페이지
-                  </Link>
-                </li>
-                <li className="py-4">
-                  <button
-                    onClick={handleLogout}
-                    className="block w-full text-left text-sm font-medium"
-                  >
-                    로그아웃
-                  </button>
-                </li>
+                
+                {isLoggedIn ? (
+                  <>
+                    <li className="py-4">
+                      <Link
+                        href="/estimate/list"
+                        className="block w-full text-sm font-medium"
+                        onClick={closeNav}
+                      >
+                        나의 견적서
+                      </Link>
+                    </li>
+                    <li className="py-4">
+                      <Link
+                        href="/mypage"
+                        className="block w-full text-sm font-medium"
+                        onClick={closeNav}
+                      >
+                        마이페이지
+                      </Link>
+                    </li>
+                    <li className="py-4">
+                      <button
+                        onClick={handleLogout}
+                        className="block w-full text-left text-sm font-medium"
+                      >
+                        로그아웃
+                      </button>
+                    </li>
+                  </>
+                ) : (
+                  <li className="py-4">
+                    <button
+                      onClick={handleLogin}
+                      className="block w-full text-left text-sm font-medium"
+                    >
+                      로그인
+                    </button>
+                  </li>
+                )}
               </ul>
             </nav>
           </div>

@@ -69,7 +69,7 @@ const Header = () => {
       localStorage.removeItem("accessToken");
       localStorage.removeItem("userRole");
       
-      // Dispatch custom event to notify the app about auth state change
+      // 로그아웃 시 이벤트 발생
       window.dispatchEvent(new Event("auth-state-changed"));
       
       setShowLogoutModal(true);

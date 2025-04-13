@@ -1,7 +1,7 @@
 // app/estimate/list/page.tsx
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Title from '@/components/Title';
 import Button from '@/components/Button';
@@ -13,7 +13,28 @@ export default function EstimateListPage() {
   const router = useRouter();
   const { estimates, loading, error } = useEstimates();
   const [currentPage, setCurrentPage] = useState(1);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const itemsPerPage = 6; // 페이지당 표시할 항목 수
+
+  useEffect(() => {
+    // 컴포넌트 마운트 시 로그인 상태 확인
+    const accessToken = localStorage.getItem('accessToken');
+    setIsLoggedIn(!!accessToken);
+
+    if (!accessToken) {
+      // 로그인되지 않은 경우 로그인 페이지로 리디렉션
+      router.push('/login');
+    }
+    // 로그인 상태 변경 감지
+    window.addEventListener("auth-state-changed", () => {
+      const token = localStorage.getItem('accessToken');
+      setIsLoggedIn(!!token);
+    });
+    
+    return () => {
+      window.removeEventListener("auth-state-changed", () => {});
+    };
+  }, [router]);
 
   // 견적서 작성 페이지로 이동하는 함수
   const handleWriteClick = () => {
@@ -28,6 +49,18 @@ export default function EstimateListPage() {
 
   // 총 페이지 수 계산
   const totalPages = Math.ceil(estimates.length / itemsPerPage);
+
+  // 로그인 상태가 아니면 로딩 상태로 표시
+  if (!isLoggedIn) {
+    return (
+      <main className="flex flex-col min-h-screen">
+        <Title pageTitle="나의 견적서" />
+        <div className="flex justify-center items-center h-screen">
+          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-gray-900"></div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="flex flex-col min-h-screen">
@@ -53,7 +86,7 @@ export default function EstimateListPage() {
         {/* 에러 메시지 표시 */}
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mt-4 mb-4">
-            <p>견적서를 불러오는 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.</p>
+            <p>{error}</p>
           </div>
         )}
         

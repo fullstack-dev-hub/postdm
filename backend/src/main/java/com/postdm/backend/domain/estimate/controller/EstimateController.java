@@ -49,11 +49,11 @@ public class EstimateController {
 
     @Operation(summary = "견적서 상세 조회", description = "사용자의 특정 견적서를 상세 조회합니다.")
     @GetMapping("/{estimateId}")
-    public ResponseEntity<EstimateResponseDto> getEstimateDetail(@PathVariable Long estimateId) {
+    public ResponseTemplate<EstimateResponseDto> getEstimateDetail(@PathVariable Long estimateId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Member member = (Member) authentication.getPrincipal();
 
         EstimateResponseDto response = estimateService.getEstimateDetail(estimateId, member);
-        return ResponseEntity.ok(response);
+        return new ResponseTemplate<>(HttpStatus.OK, "견적서 상세 조회 성공", response);
     }
 }

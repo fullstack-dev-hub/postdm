@@ -112,4 +112,45 @@ class EstimateServiceTest {
         System.out.println("예외 클래스: " + exception.getClass().getName());
         System.out.println("예외 메시지: " + exception.getMessage());
     }
+
+    @Test
+    @DisplayName("일반 사용자가 본인의 견적서를 상세 조회할 수 있다")
+    void 일반_사용자는_자신의_견적서_상세_조회_가능() {
+        // when
+        EstimateResponseDto response = estimateService.getEstimateDetail(testEstimate.getId(), testMember);
+
+        // then
+        assertThat(response).isNotNull();
+        assertThat(response.getContent()).isEqualTo(testEstimate.getContent());
+        assertThat(response.getMemberId()).isEqualTo(testMember.getId());
+    }
+
+    @Test
+    @DisplayName("일반 사용자가 다른 사람의 견적서를 상세 조회하면 예외가 발생한다")
+    void 일반_사용자는_다른_사용자의_견적서_상세_조회_불가() {
+        // given
+        Member otherUser = new Member(0L, "otherUser", "nickname2", "pass", "other@ex.com", "01012345678", MemberRole.MEMBER);
+        memberRepository.saveAndFlush(otherUser);
+
+        // when & then
+        assertThrows(RuntimeException.class, () -> {
+            estimateService.getEstimateDetail(testEstimate.getId(), otherUser);
+        });
+    }
+
+    @Test
+    @DisplayName("관리자는 모든 사용자의 견적서를 상세 조회할 수 있다")
+    void 관리자는_모든_견적서_상세_조회_가능() {
+        // given
+        Member admin = new Member(0L, "admin", "관리자", "adminpass", "admin@ex.com", "01000000000", MemberRole.ADMIN);
+        memberRepository.saveAndFlush(admin);
+
+        // when
+        EstimateResponseDto response = estimateService.getEstimateDetail(testEstimate.getId(), admin);
+
+        // then
+        assertThat(response).isNotNull();
+        assertThat(response.getContent()).isEqualTo(testEstimate.getContent());
+        assertThat(response.getMemberId()).isEqualTo(testEstimate.getMember().getId());
+    }
 }

@@ -87,4 +87,32 @@ public class EstimateService {
                 ))
                 .collect(Collectors.toList());
     }
+
+    public EstimateResponseDto getEstimateDetail(Long estimateId, Member member) {
+        if (member == null) {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication != null && authentication.getPrincipal() instanceof Member) {
+                member = (Member) authentication.getPrincipal();
+            } else {
+                throw new CustomException(ErrorCode.AUTHORIZED_MEMBER_NOT_FOUND);
+            }
+        }
+
+        Estimate estimate = estimateRepository.findById(estimateId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ESTIMATE_NOT_FOUND));
+
+        // 권한 체크
+        if (member.getRole() != ADMIN &&
+                estimate.getMember().getId() != member.getId()) {
+            throw new CustomException(ErrorCode.ACCESS_DENIED);
+        }
+
+        return new EstimateResponseDto(
+            estimate.getId(),
+            estimate.getTitle(),
+            estimate.getContent(),
+            estimate.getCreatedAt(),
+            estimate.getMember().getId()
+        );
+    }
 }

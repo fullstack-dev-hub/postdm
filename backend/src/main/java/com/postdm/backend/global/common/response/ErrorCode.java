@@ -30,6 +30,8 @@ public enum ErrorCode {
 
     // 견적서 관련
     ESTIMATE_NULL(HttpStatus.BAD_REQUEST, "견적서 내용은 비어있을 수 없습니다."),
+    ESTIMATE_NOT_FOUND(HttpStatus.NOT_FOUND, "견적서를 찾을 수 없습니다."),
+    ACCESS_DENIED(HttpStatus.FORBIDDEN, "해당 견적서를 조회할 권한이 없습니다."),
 
     // 서버 에러
     DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 에러"),

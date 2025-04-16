@@ -42,7 +42,7 @@ jobs:
         run: |
           cd frontend
           docker build -t frontend-service .
-          docker tag backend-service:latest ${{ secrets.AWS_ECR_FRONTEND_REPOSITORY }}:latest
+          docker tag frontend-service:latest ${{ secrets.AWS_ECR_FRONTEND_REPOSITORY }}:latest
           docker push ${{ secrets.AWS_ECR_FRONTEND_REPOSITORY }}:latest
 
       - name: SSH into EC2 and deploy frontend

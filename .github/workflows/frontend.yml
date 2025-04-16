@@ -57,12 +57,6 @@ jobs:
             
             echo "Logging into ECR and pulling image..."
             aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin ${{ secrets.AWS_ECR_FRONTEND_REPOSITORY }}
-            
-#            echo "Updating environment variables..."
-#            cat <<EOF > .env
-#            NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
-#            BASE_URL=${{ secrets.BASE_URL }}
-#            EOF
 
             echo "Deploying frontend container..."
             docker compose pull frontend

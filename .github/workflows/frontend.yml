@@ -1,0 +1,76 @@
+name: Deploy Frontend to EC2
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Get GitHub Actions Public IP
+        id: ip
+        uses: haythem/public-ip@v1.3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+
+      - name: Authorize GitHub IP for EC2 SSH
+        run: |
+          aws ec2 authorize-security-group-ingress \
+            --group-id ${{ secrets.AWS_SECURITY_GROUP_ID }} \
+            --protocol tcp \
+            --port 22 \
+            --cidr ${{ steps.ip.outputs.ipv4 }}/32
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build Docker image and push to AWS ECR
+        run: |
+          cd frontend
+          docker build -t frontend-service .
+          docker tag backend-service:latest ${{ secrets.AWS_ECR_FRONTEND_REPOSITORY }}:latest
+          docker push ${{ secrets.AWS_ECR_FRONTEND_REPOSITORY }}:latest
+
+      - name: SSH into EC2 and deploy frontend
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+          port: ${{ secrets.PORT }}
+          script: |
+            cd /home/${{ secrets.EC2_USERNAME }}/frontend
+            
+            echo "Logging into ECR and pulling image..."
+            aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin ${{ secrets.AWS_ECR_FRONTEND_REPOSITORY }}
+            
+#            echo "Updating environment variables..."
+#            cat <<EOF > .env
+#            NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
+#            BASE_URL=${{ secrets.BASE_URL }}
+#            EOF
+
+            echo "Deploying frontend container..."
+            docker compose pull frontend
+            docker compose up -d --no-deps frontend
+
+      - name: Remove GitHub Actions IP from EC2 security group
+        if: always()
+        run: |
+          aws ec2 revoke-security-group-ingress \
+            --group-id ${{ secrets.AWS_SECURITY_GROUP_ID }} \
+            --protocol tcp \
+            --port 22 \
+            --cidr ${{ steps.ip.outputs.ipv4 }}/32

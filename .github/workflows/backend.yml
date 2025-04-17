@@ -71,7 +71,7 @@ jobs:
           key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
           port: ${{ secrets.PORT }}
           script: |
-            cd /home/${{ secrets.EC2_USERNAME }}/backend
+            cd /home/${{ secrets.EC2_USERNAME }}/postdm
             
             aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin ${{ secrets.AWS_ECR_REPOSITORY }}
             

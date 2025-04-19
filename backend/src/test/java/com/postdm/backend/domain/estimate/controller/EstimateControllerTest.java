@@ -89,7 +89,7 @@ class EstimateControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content").value("테스트 견적서 내용입니다."));
+                .andExpect(jsonPath("$.data.content").value("테스트 견적서 내용입니다."));
     }
 
     @Test
@@ -99,8 +99,8 @@ class EstimateControllerTest {
         mockMvc.perform(get("/api/v1/estimates")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.size()").value(1))
-                .andExpect(jsonPath("$[0].content").value("테스트 견적 내용입니다."));
+                .andExpect(jsonPath("$.data.size()").value(1))
+                .andExpect(jsonPath("$.data[0].content").value("테스트 견적 내용입니다."));
     }
 
     @Test

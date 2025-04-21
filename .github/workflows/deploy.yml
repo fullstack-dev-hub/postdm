@@ -1,21 +1,15 @@
 name: Deploy with Docker Compose
 
 on:
-  workflow_run:
-    workflows: [ "Frontend CI", "Backend CI" ]
-    types:
-      - completed
-  workflow_dispatch:
   push:
     branches:
       - main
       - develop
       - feature/**
+  workflow_dispatch:
 
 jobs:
   deploy:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
-
     runs-on: ubuntu-latest
 
     steps:

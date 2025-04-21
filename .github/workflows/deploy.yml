@@ -1,0 +1,76 @@
+name: Deploy with Docker Compose
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - develop
+      - feature/**
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Get GitHub Actions Public IP
+        id: ip
+        uses: haythem/public-ip@v1.3
+
+      - name: Authorize GitHub IP
+        run: |
+          aws ec2 authorize-security-group-ingress \
+            --group-id ${{ secrets.AWS_SECURITY_GROUP_ID }} \
+            --protocol tcp \
+            --port 22 \
+            --cidr ${{ steps.ip.outputs.ipv4 }}/32
+
+      - name: Deploy to EC2 with docker-compose
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+          script: |
+            cd /home/ubuntu/app
+
+            echo "Logging in to ECR..."
+            aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
+
+            echo "Updating .env file"
+            cat <<EOF > .env
+            MYSQL_URL=${{ secrets.MYSQL_URL }}
+            MYSQL_USERNAME=${{ secrets.MYSQL_USERNAME }}
+            MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}
+            MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}
+            MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }}
+            
+            SPRING_PROFILES_ACTIVE=${{ secrets.SPRING_PROFILES_ACTIVE }}
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
+            JWT_EXPIRATION=${{ secrets.JWT_EXPIRATION }}
+            JWT_EXPIREDMS=${{ secrets.JWT_EXPIREDMS }}
+            JWT_REFRESHEDMS=${{ secrets.JWT_REFRESHEDMS }}
+            
+            SPRING_MAIL_HOST=${{ secrets.SPRING_MAIL_HOST }}
+            SPRING_MAIL_PORT=${{ secrets.SPRING_MAIL_PORT }}
+            SPRING_MAIL_USERNAME=${{ secrets.SPRING_MAIL_USERNAME }}
+            SPRING_MAIL_PASSWORD=${{ secrets.SPRING_MAIL_PASSWORD }}
+            
+            EOF
+            
+            echo "Pulling latest images..."
+            docker compose pull
+            
+            echo "Starting containers..."
+            docker compose up -d --force-recreate
+
+      - name: Revoke GitHub IP
+        if: always()
+        run: |
+          aws ec2 revoke-security-group-ingress \
+            --group-id ${{ secrets.AWS_SECURITY_GROUP_ID }} \
+            --protocol tcp \
+            --port 22 \
+            --cidr ${{ steps.ip.outputs.ipv4 }}/32

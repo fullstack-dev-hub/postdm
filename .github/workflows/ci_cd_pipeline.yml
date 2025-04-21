@@ -1,4 +1,4 @@
-name: Deploy with Docker Compose
+name: CI/CD Pipeline
 
 on:
   push:
@@ -9,9 +9,61 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy:
+  frontend:
+    name: Build & Push Frontend
     runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build Docker image and push to AWS ECR
+        run: |
+          cd frontend
+          docker build -t frontend-service .
+          docker tag frontend-service:latest ${{ secrets.AWS_ECR_FRONTEND_REPOSITORY }}:latest
+          docker push ${{ secrets.AWS_ECR_FRONTEND_REPOSITORY }}:latest
+
+  backend:
+    name: Build & Push Backend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+
+      - name: Login to AWS ECR
+        run: |
+          ECR_URL="${{ secrets.AWS_ECR_REPOSITORY }}"
+          echo "Logging into AWS ECR: $ECR_URL"
+          aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin $ECR_URL
+
+      - name: Build Docker image and push to AWS ECR
+        run: |
+          cd backend
+          docker build -t backend-service .
+          docker tag backend-service:latest ${{ secrets.AWS_ECR_REPOSITORY }}:latest
+          docker push ${{ secrets.AWS_ECR_REPOSITORY }}:latest
+
+  deploy:
+    name: Deploy to EC2
+    runs-on: ubuntu-latest
+    needs: [frontend, backend]
     steps:
       - uses: actions/checkout@v3
 
@@ -42,10 +94,10 @@ jobs:
           key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
           script: |
             cd /home/${{ secrets.EC2_USERNAME }}/postdm
-
+            
             echo "Logging in to ECR..."
             aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
-
+            
             echo "Updating .env file"
             cat <<EOF > .env
             MYSQL_URL=${{ secrets.MYSQL_URL }}

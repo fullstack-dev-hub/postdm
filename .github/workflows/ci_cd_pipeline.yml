@@ -99,7 +99,6 @@ jobs:
             aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin ${{ secrets.AWS_ECR_REPOSITORY }}
             aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin ${{ secrets.AWS_ECR_FRONTEND_REPOSITORY }}
             
-            
             echo "Updating .env file"
             cat <<EOF > .env
             MYSQL_URL=${{ secrets.MYSQL_URL }}

@@ -33,7 +33,7 @@ public class AuthService { // 로그인 및 회원가입 서비스
             CertificationRepository certificationRepository,
             BCryptPasswordEncoder bCryptPasswordEncoder,
             JwtProvider jwtProvider,
-            @Value("${jwt.expiredMS}") int refreshedMS,
+            @Value("${jwt.refreshedMs}") int refreshedMS,
             TokenBlacklistService tokenBlacklistService) {
         this.memberRepository = memberRepository;
         this.certificationRepository = certificationRepository;
@@ -126,15 +126,15 @@ public class AuthService { // 로그인 및 회원가입 서비스
         TokenInfo token = jwtProvider.generateToken(username, role); // 로그인이 완료되면 토큰 생성
         String refreshToken = jwtProvider.generateRefreshToken(username, role);
 
-        response.addCookie(createCookie("Refresh", refreshToken)); // 쿠키에 refresh 토큰 담음
+        response.addCookie(createCookie(refreshToken)); // 쿠키에 refresh 토큰 담음
 
 
         return token; // 응답 body에는 access 토큰 반환
     }
 
-    private Cookie createCookie(String name, String value) { // 쿠키 생성 메소드
-        Cookie cookie = new Cookie(name, value);
-        cookie.setMaxAge(refreshedMS);
+    private Cookie createCookie(String value) { // 쿠키 생성 메소드
+        Cookie cookie = new Cookie("Refresh", value);
+        cookie.setMaxAge(refreshedMS / 1000);
         cookie.setSecure(true);
         cookie.setHttpOnly(true);
 

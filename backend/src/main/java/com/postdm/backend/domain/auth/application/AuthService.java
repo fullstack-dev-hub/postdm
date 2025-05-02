@@ -1,7 +1,9 @@
 package com.postdm.backend.domain.auth.application;
 
+import com.postdm.backend.domain.auth.domain.RefreshToken;
 import com.postdm.backend.domain.auth.dto.SignInRequestDto;
 import com.postdm.backend.domain.auth.dto.SignUpRequestDto;
+import com.postdm.backend.domain.auth.repository.RefreshTokenRepository;
 import com.postdm.backend.domain.email.domain.entity.CertificationEntity;
 import com.postdm.backend.domain.email.domain.repository.CertificationRepository;
 import com.postdm.backend.domain.member.domain.entity.Member;
@@ -14,8 +16,14 @@ import com.postdm.backend.global.jwt.util.JwtProvider;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseCookie;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.time.Duration;
+import java.time.LocalDateTime;
 
 @Service
 public class AuthService { // 로그인 및 회원가입 서비스
@@ -26,6 +34,7 @@ public class AuthService { // 로그인 및 회원가입 서비스
     private final JwtProvider jwtProvider;
     private final int refreshedMS;
     private final TokenBlacklistService tokenBlacklistService;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     // 생성자 주입 방식
     public AuthService(
@@ -33,14 +42,16 @@ public class AuthService { // 로그인 및 회원가입 서비스
             CertificationRepository certificationRepository,
             BCryptPasswordEncoder bCryptPasswordEncoder,
             JwtProvider jwtProvider,
-            @Value("${jwt.refreshedMs}") int refreshedMS,
-            TokenBlacklistService tokenBlacklistService) {
+            @Value("${jwt.expiredMS}") int refreshedMS,
+            TokenBlacklistService tokenBlacklistService,
+            RefreshTokenRepository refreshTokenRepository) {
         this.memberRepository = memberRepository;
         this.certificationRepository = certificationRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.jwtProvider = jwtProvider;
         this.refreshedMS = refreshedMS;
         this.tokenBlacklistService = tokenBlacklistService;
+        this.refreshTokenRepository = refreshTokenRepository;
     }
 
 
@@ -126,15 +137,24 @@ public class AuthService { // 로그인 및 회원가입 서비스
         TokenInfo token = jwtProvider.generateToken(username, role); // 로그인이 완료되면 토큰 생성
         String refreshToken = jwtProvider.generateRefreshToken(username, role);
 
-        response.addCookie(createCookie(refreshToken)); // 쿠키에 refresh 토큰 담음
+        LocalDateTime expiration = jwtProvider.getExpiration(refreshToken);
+
+        // 로그인 성공 후, Refresh Token을 DB에 저장
+        refreshTokenRepository.save(new RefreshToken(
+                username,
+                refreshToken,
+                expiration
+        ));
+
+        response.addCookie(createCookie("Refresh", refreshToken)); // 쿠키에 refresh 토큰 담음
 
 
         return token; // 응답 body에는 access 토큰 반환
     }
 
-    private Cookie createCookie(String value) { // 쿠키 생성 메소드
-        Cookie cookie = new Cookie("Refresh", value);
-        cookie.setMaxAge(refreshedMS / 1000);
+    private Cookie createCookie(String name, String value) { // 쿠키 생성 메소드
+        Cookie cookie = new Cookie(name, value);
+        cookie.setMaxAge(refreshedMS);
         cookie.setSecure(true);
         cookie.setHttpOnly(true);
 
@@ -142,11 +162,70 @@ public class AuthService { // 로그인 및 회원가입 서비스
     }
 
     public void signOut(String accessToken) {
-        long expireMillis = jwtProvider.getExpiration(accessToken);
-        boolean isNewlySaved = tokenBlacklistService.saveIfNotExists(accessToken, expireMillis);
+        LocalDateTime expiration = jwtProvider.getExpiration(accessToken);
+        boolean isNewlySaved = tokenBlacklistService.saveIfNotExists(accessToken, expiration);
 
         if (!isNewlySaved) {
             throw new CustomException(ErrorCode.ALREADY_SIGN_OUT);
         }
+
+        Authentication authentication = jwtProvider.getAuthentication(accessToken);
+        Member member = (Member) authentication.getPrincipal();
+        String username = member.getUsername();
+
+        // Refresh Token 삭제
+        refreshTokenRepository.findById(username)
+                .ifPresent(refreshTokenRepository::delete);
+    }
+
+    public TokenInfo reissue(String oldRefreshToken, HttpServletResponse response) {
+        if (!jwtProvider.validateToken(oldRefreshToken)) {
+            throw new CustomException(ErrorCode.INVALID_REFRESH_TOKEN);
+        }
+
+        Authentication authentication = jwtProvider.getAuthentication(oldRefreshToken);
+        Member member = (Member) authentication.getPrincipal();
+        String username = member.getUsername();
+
+        RefreshToken saved = refreshTokenRepository.findById(username)
+                .orElseThrow(() -> new CustomException(ErrorCode.REFRESH_TOKEN_NOT_FOUND));
+
+        if (!saved.getRefreshToken().equals(oldRefreshToken)) {
+            throw new CustomException(ErrorCode.INVALID_REFRESH_TOKEN);
+        }
+
+        // Access Token 재발급
+        String role = extractRole(authentication);
+        String newAccessToken = jwtProvider.generateAccessToken(username, role);
+
+        // Refresh Token 회전(Rotation)
+        String newRefreshToken = jwtProvider.generateRefreshToken(username, role);
+        LocalDateTime expiration = jwtProvider.getExpiration(newRefreshToken);
+        saved.update(newRefreshToken, expiration);
+        refreshTokenRepository.save(saved);
+
+        ResponseCookie cookie = ResponseCookie.from("Refresh", newRefreshToken)
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(Duration.ofDays(7))
+                .sameSite("Strict")
+                .build();
+
+        response.addHeader("Set-Cookie", cookie.toString());
+
+        return TokenInfo.builder()
+                .grantType("Bearer")
+                .accessToken(newAccessToken)
+                .role(role)
+                .build();
+    }
+
+    private String extractRole(Authentication authentication) {
+        return authentication.getAuthorities().stream()
+                .findFirst()
+                .map(GrantedAuthority::getAuthority)
+                .orElseThrow(() -> new CustomException(ErrorCode.ROLE_NOT_FOUND))
+                .replace("ROLE_", "");
     }
 }

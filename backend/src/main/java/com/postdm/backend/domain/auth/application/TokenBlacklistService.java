@@ -7,8 +7,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Service
 @RequiredArgsConstructor
@@ -17,7 +18,9 @@ public class TokenBlacklistService {
     private final TokenBlacklistRepository repository;
 
     public void save(String token, long expireMillis) {
-        LocalDateTime expiration = LocalDateTime.now().plus(Duration.ofMillis(expireMillis));
+        LocalDateTime expiration = Instant.ofEpochMilli(expireMillis)
+                .atZone(ZoneId.of("Asia/Seoul"))
+                .toLocalDateTime();
         repository.save(new TokenBlacklist(token, expiration));
     }
 
@@ -26,13 +29,12 @@ public class TokenBlacklistService {
     }
 
     // 중복 저장 방지
-    public boolean saveIfNotExists(String token, long expireMillis) {
+    public boolean saveIfNotExists(String token, LocalDateTime expireMillis) {
         if (repository.existsByToken(token)) {
-            return false; // 이미 블랙리스트에 있음
+            return false;
         }
 
-        LocalDateTime expiration = LocalDateTime.now().plus(Duration.ofMillis(expireMillis));
-        repository.save(new TokenBlacklist(token, expiration));
+        repository.save(new TokenBlacklist(token, expireMillis));
         return true;
     }
 

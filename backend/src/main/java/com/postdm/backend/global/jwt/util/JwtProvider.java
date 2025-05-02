@@ -16,6 +16,8 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -120,7 +122,7 @@ public class JwtProvider { // JWT 발급을 위한 Provider
     }
 
     // JWT 토큰 만료 시간 반환
-    public long getExpiration(String token) {
+    public LocalDateTime getExpiration(String token) {
         Claims claims = Jwts.parser()
                 .verifyWith(secretKey)
                 .build()
@@ -128,6 +130,8 @@ public class JwtProvider { // JWT 발급을 위한 Provider
                 .getPayload();
 
         Date expiration = claims.getExpiration();
-        return expiration.getTime() - System.currentTimeMillis();
+        return expiration.toInstant()
+                .atZone(ZoneId.of("Asia/Seoul"))
+                .toLocalDateTime();
     }
 }

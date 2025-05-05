@@ -16,7 +16,6 @@ import com.postdm.backend.global.jwt.util.JwtProvider;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -42,7 +41,7 @@ public class AuthService { // 로그인 및 회원가입 서비스
             CertificationRepository certificationRepository,
             BCryptPasswordEncoder bCryptPasswordEncoder,
             JwtProvider jwtProvider,
-            @Value("${jwt.expiredMS}") int refreshedMS,
+            @Value("${jwt.refreshedMs}") int refreshedMS,
             TokenBlacklistService tokenBlacklistService,
             RefreshTokenRepository refreshTokenRepository) {
         this.memberRepository = memberRepository;
@@ -146,14 +145,14 @@ public class AuthService { // 로그인 및 회원가입 서비스
                 expiration
         ));
 
-        response.addCookie(createCookie("Refresh", refreshToken)); // 쿠키에 refresh 토큰 담음
-
+        response.addCookie(createCookie(refreshToken)); // 쿠키에 refresh 토큰 담음
 
         return token; // 응답 body에는 access 토큰 반환
     }
 
-    private Cookie createCookie(String name, String value) { // 쿠키 생성 메소드
-        Cookie cookie = new Cookie(name, value);
+    private Cookie createCookie(String value) { // 쿠키 생성 메소드
+        Cookie cookie = new Cookie("Refresh", value);
+        cookie.setMaxAge(refreshedMS / 1000);
         cookie.setMaxAge(refreshedMS);
         cookie.setSecure(true);
         cookie.setHttpOnly(true);
@@ -204,15 +203,7 @@ public class AuthService { // 로그인 및 회원가입 서비스
         saved.update(newRefreshToken, expiration);
         refreshTokenRepository.save(saved);
 
-        ResponseCookie cookie = ResponseCookie.from("Refresh", newRefreshToken)
-                .httpOnly(true)
-                .secure(true)
-                .path("/")
-                .maxAge(Duration.ofDays(7))
-                .sameSite("Strict")
-                .build();
-
-        response.addHeader("Set-Cookie", cookie.toString());
+        response.addCookie(createCookie(newRefreshToken));
 
         return TokenInfo.builder()
                 .grantType("Bearer")

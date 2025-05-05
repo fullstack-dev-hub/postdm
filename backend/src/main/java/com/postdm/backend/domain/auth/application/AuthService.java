@@ -21,7 +21,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 
 @Service
@@ -153,7 +152,6 @@ public class AuthService { // 로그인 및 회원가입 서비스
     private Cookie createCookie(String value) { // 쿠키 생성 메소드
         Cookie cookie = new Cookie("Refresh", value);
         cookie.setMaxAge(refreshedMS / 1000);
-        cookie.setMaxAge(refreshedMS);
         cookie.setSecure(true);
         cookie.setHttpOnly(true);
 

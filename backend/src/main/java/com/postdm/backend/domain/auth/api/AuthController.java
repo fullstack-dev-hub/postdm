@@ -89,4 +89,14 @@ public class AuthController { // 로그인 및 회원 가입 컨트롤러
 
         return new ResponseTemplate<>(HttpStatus.OK, "로그아웃 성공", token);
     }
+
+    @Operation(summary = "토큰 재발급", description = "Refresh Token 기반의 Access Token 재발급 API 입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공"),
+    })
+    @PostMapping("/reissue")
+    public ResponseTemplate<TokenInfo> reissue(@CookieValue("Refresh") String refreshToken, HttpServletResponse response) {
+        TokenInfo token = authService.reissue(refreshToken, response);
+        return new ResponseTemplate<>(HttpStatus.OK, "토큰 재발급 성공", token);
+    }
 }

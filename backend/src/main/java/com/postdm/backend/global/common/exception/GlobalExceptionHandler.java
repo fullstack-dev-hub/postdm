@@ -2,7 +2,9 @@ package com.postdm.backend.global.common.exception;
 
 import com.postdm.backend.global.common.response.ErrorCode;
 import com.postdm.backend.global.common.response.ErrorResponse;
+import io.jsonwebtoken.JwtException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -46,4 +48,10 @@ public class GlobalExceptionHandler {
                 .body(new ErrorResponse(ErrorCode.VALIDATION_FAIL));
     }
 
+    @ExceptionHandler(JwtException.class)
+    public ResponseEntity<ErrorResponse> handleJwtException(JwtException e) {
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(new ErrorResponse(ErrorCode.INVALID_REFRESH_TOKEN));
+    }
 }

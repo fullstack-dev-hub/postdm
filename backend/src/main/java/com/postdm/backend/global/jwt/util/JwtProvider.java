@@ -2,6 +2,9 @@ package com.postdm.backend.global.jwt.util;
 
 import com.postdm.backend.domain.member.domain.entity.Member;
 import com.postdm.backend.domain.member.domain.repository.MemberRepository;
+import com.postdm.backend.domain.member.dto.MemberPrincipalDto;
+import com.postdm.backend.global.common.exception.CustomException;
+import com.postdm.backend.global.common.response.ErrorCode;
 import com.postdm.backend.global.jwt.dto.TokenInfo;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.SecurityException;
@@ -110,15 +113,19 @@ public class JwtProvider { // JWT 발급을 위한 Provider
 
         String role = claims.get("role", String.class);  // role 추출
 
-        Member member = memberRepository.findByUsername(username);
-        if (member == null) {
-            throw new RuntimeException("해당 사용자 정보를 찾을 수 없습니다.");
-        }
+        Member member = memberRepository.findByUsername(username)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+
+        MemberPrincipalDto memberPrincipalDto = MemberPrincipalDto.builder()
+                .id(member.getId())
+                .nickname(member.getNickname())
+                .username(username)
+                .build();
 
         List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role));
 
         // Spring Security에서 Authentication 객체의 principal을 Member 객체로 저장
-        return new UsernamePasswordAuthenticationToken(member, "", authorities);
+        return new UsernamePasswordAuthenticationToken(memberPrincipalDto, "", authorities);
     }
 
     // JWT 토큰 만료 시간 반환

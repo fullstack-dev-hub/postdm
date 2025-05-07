@@ -97,7 +97,6 @@ public class JwtProvider { // JWT 발급을 위한 Provider
     public TokenInfo generateToken(String username, String role) { // 토큰 생성
 
         String accessToken = generateAccessToken(username, role);
-        String refreshToken = generateRefreshToken(username, role);
 
         return TokenInfo.builder()
                 .grantType("Bearer")

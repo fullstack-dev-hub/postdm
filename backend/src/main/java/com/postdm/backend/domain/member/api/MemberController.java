@@ -5,6 +5,8 @@ import com.postdm.backend.domain.email.dto.CheckCertificationRequestDto;
 import com.postdm.backend.domain.member.application.MemberService;
 import com.postdm.backend.domain.member.domain.entity.Member;
 import com.postdm.backend.domain.member.dto.FindUsernameRequestDto;
+import com.postdm.backend.domain.member.dto.MemberInfoDto;
+import com.postdm.backend.domain.member.dto.MemberPrincipalDto;
 import com.postdm.backend.domain.member.dto.ResetPasswordRequestDto;
 import com.postdm.backend.global.template.ResponseTemplate;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,10 +14,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/member")
@@ -65,5 +65,21 @@ public class MemberController {
         Member member = memberService.resetPassword(requestDto);
 
         return new ResponseTemplate<>(HttpStatus.OK, "비밀번호 변경 성공", member);
+    }
+
+    @GetMapping("/my-page")
+    public ResponseTemplate<MemberInfoDto> memberInfo(@AuthenticationPrincipal MemberPrincipalDto memberPrincipalDto) {
+        String username = memberPrincipalDto.getUsername();
+        MemberInfoDto member = memberService.loadMemberInfo(username);
+        return new ResponseTemplate<>(HttpStatus.OK, "조회 성공", member);
+    }
+
+    @PatchMapping("/my-page/edit")
+    public ResponseTemplate<?> editMemberInfo(@AuthenticationPrincipal MemberPrincipalDto memberPrincipalDto,
+                                              @RequestBody MemberInfoDto memberInfoDto) {
+        String username = memberPrincipalDto.getUsername();
+        memberService.updateMemberInfo(username, memberInfoDto);
+
+        return new ResponseTemplate<>(HttpStatus.OK, "회원 정보 수정 성공");
     }
 }

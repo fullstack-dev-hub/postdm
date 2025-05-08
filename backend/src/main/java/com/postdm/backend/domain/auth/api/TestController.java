@@ -1,7 +1,9 @@
 package com.postdm.backend.domain.auth.api;
 
+import com.postdm.backend.domain.member.dto.MemberPrincipalDto;
 import com.postdm.backend.global.template.ResponseTemplate;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -9,11 +11,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class TestController { // 현재 사용자 세션 확인용 테스트 컨트롤러
     @GetMapping("/test")
-    public ResponseTemplate<String> test() {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+    public ResponseTemplate<String> test(@AuthenticationPrincipal MemberPrincipalDto member) {
 
+        String nickname = member.getNickname();
         String role = SecurityContextHolder.getContext().getAuthentication().getAuthorities().iterator().next().getAuthority();
 
-        return new ResponseTemplate<>(HttpStatus.OK, "환영합니다, " + role + ", " + username + "님!", username);
+        return new ResponseTemplate<>(HttpStatus.OK, "환영합니다, " + role + ", " + nickname + "님!", nickname);
     }
 }

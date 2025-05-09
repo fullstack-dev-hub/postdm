@@ -10,6 +10,7 @@ import com.postdm.backend.domain.member.dto.MemberInfoDto;
 import com.postdm.backend.domain.member.dto.ResetPasswordRequestDto;
 import com.postdm.backend.global.common.exception.CustomException;
 import com.postdm.backend.global.common.response.ErrorCode;
+import jakarta.validation.Valid;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -80,7 +81,7 @@ public class MemberService {
                 build();
     }
 
-    public void updateMemberInfo(String username, MemberInfoDto memberInfoDto) {
+    public void updateMemberInfo(String username, @Valid MemberInfoDto memberInfoDto) {
         Member member = memberRepository.findByUsername(username)
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 

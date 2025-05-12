@@ -88,15 +88,24 @@ public class MemberService {
         List<MemberInfoDto> list = new ArrayList<>();
         list.add(memberInfoDto);
 
-        for(int i = 0; i < list.size(); i++) {
-            if(list.get(i).getNickname() != null) {
-                member.setNickname(list.get(i).getNickname());
+        for (MemberInfoDto infoDto : list) {
+            if (infoDto.getNickname() != null) {
+                if (infoDto.getNickname().isEmpty()) {
+                    throw new CustomException(ErrorCode.VALIDATION_FAIL);
+                }
+                member.setNickname(infoDto.getNickname());
             };
-            if(list.get(i).getEmail() != null) {
-                member.setEmail(list.get(i).getEmail());
+            if (infoDto.getEmail() != null) {
+                if(infoDto.getEmail().isEmpty()) {
+                    throw new CustomException(ErrorCode.VALIDATION_FAIL);
+                }
+                member.setEmail(infoDto.getEmail());
             };
-            if(list.get(i).getPhone() != null) {
-                member.setPhone(list.get(i).getPhone());
+            if (infoDto.getPhone() != null) {
+                if (infoDto.getPhone().isEmpty()) {
+                    throw new CustomException(ErrorCode.VALIDATION_FAIL);
+                }
+                member.setPhone(infoDto.getPhone());
             };
         }
 

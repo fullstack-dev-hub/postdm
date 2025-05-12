@@ -67,6 +67,10 @@ public class MemberController {
         return new ResponseTemplate<>(HttpStatus.OK, "비밀번호 변경 성공", member);
     }
 
+    @Operation(summary = "마이페이지 조회 컨트롤러")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공"),
+    })
     @GetMapping("/my-page")
     public ResponseTemplate<MemberInfoDto> memberInfo(@AuthenticationPrincipal MemberPrincipalDto memberPrincipalDto) {
         String username = memberPrincipalDto.getUsername();
@@ -74,9 +78,13 @@ public class MemberController {
         return new ResponseTemplate<>(HttpStatus.OK, "조회 성공", member);
     }
 
+    @Operation(summary = "마이페이지 수정 컨트롤러")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공"),
+    })
     @PatchMapping("/my-page/edit")
     public ResponseTemplate<?> editMemberInfo(@AuthenticationPrincipal MemberPrincipalDto memberPrincipalDto,
-                                              @RequestBody MemberInfoDto memberInfoDto) {
+                                              @RequestBody @Valid MemberInfoDto memberInfoDto) {
         String username = memberPrincipalDto.getUsername();
         memberService.updateMemberInfo(username, memberInfoDto);
 

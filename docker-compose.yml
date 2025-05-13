@@ -54,6 +54,7 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
       - /etc/letsencrypt:/etc/letsencrypt:ro
+      - /var/www/html:/var/www/html
     restart: always
 
 volumes:

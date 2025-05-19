@@ -117,10 +117,8 @@ public class AuthService { // 로그인 및 회원가입 서비스
     public TokenInfo signIn(SignInRequestDto signInRequestDto, HttpServletResponse response) { // 로그인 서비스
         String username = signInRequestDto.getUsername();
 
-        Member member = memberRepository.findByUsername(username);
-        if(member == null) {
-            throw new CustomException(ErrorCode.MEMBER_NOT_FOUND);
-        }
+        Member member = memberRepository.findByUsername(username)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
         String password = signInRequestDto.getPassword();
         String encodedPassword = member.getPassword();

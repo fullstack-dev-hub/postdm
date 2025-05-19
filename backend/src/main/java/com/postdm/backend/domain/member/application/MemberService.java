@@ -6,9 +6,18 @@ import com.postdm.backend.domain.email.dto.CheckCertificationRequestDto;
 import com.postdm.backend.domain.member.dto.FindUsernameRequestDto;
 import com.postdm.backend.domain.member.domain.entity.Member;
 import com.postdm.backend.domain.member.domain.repository.MemberRepository;
+import com.postdm.backend.domain.member.dto.MemberInfoDto;
 import com.postdm.backend.domain.member.dto.ResetPasswordRequestDto;
+import com.postdm.backend.global.common.exception.CustomException;
+import com.postdm.backend.global.common.response.ErrorCode;
+import jakarta.validation.Valid;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class MemberService {
@@ -51,12 +60,55 @@ public class MemberService {
             throw new IllegalArgumentException();
         }
 
-        Member member = memberRepository.findByUsername(username);
+        Member member = memberRepository.findByUsername(username)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
         member.setPassword(encodedPassword);
 
         memberRepository.save(member);
         certificationRepository.delete(certificationEntity);
 
         return member;
+    }
+
+    public MemberInfoDto loadMemberInfo(String username) {
+        Member member = memberRepository.findByUsername(username)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+
+        return MemberInfoDto.builder().
+                nickname(member.getNickname()).
+                email(member.getEmail()).
+                phone(member.getPhone()).
+                build();
+    }
+
+    public void updateMemberInfo(String username, @Valid MemberInfoDto memberInfoDto) {
+        Member member = memberRepository.findByUsername(username)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+
+        List<MemberInfoDto> list = new ArrayList<>();
+        list.add(memberInfoDto);
+
+        for (MemberInfoDto infoDto : list) {
+            if (infoDto.getNickname() != null) {
+                if (infoDto.getNickname().isEmpty()) {
+                    throw new CustomException(ErrorCode.VALIDATION_FAIL);
+                }
+                member.setNickname(infoDto.getNickname());
+            };
+            if (infoDto.getEmail() != null) {
+                if(infoDto.getEmail().isEmpty()) {
+                    throw new CustomException(ErrorCode.VALIDATION_FAIL);
+                }
+                member.setEmail(infoDto.getEmail());
+            };
+            if (infoDto.getPhone() != null) {
+                if (infoDto.getPhone().isEmpty()) {
+                    throw new CustomException(ErrorCode.VALIDATION_FAIL);
+                }
+                member.setPhone(infoDto.getPhone());
+            };
+        }
+
+        memberRepository.save(member);
     }
 }

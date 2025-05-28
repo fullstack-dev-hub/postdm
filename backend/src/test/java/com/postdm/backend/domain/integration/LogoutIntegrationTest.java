@@ -1,7 +1,6 @@
-package com.postdm.backend.domain.estimate.integration;
+package com.postdm.backend.domain.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.postdm.backend.domain.auth.dto.SignInRequestDto;
 import com.postdm.backend.domain.auth.repository.TokenBlacklistRepository;
 import com.postdm.backend.domain.member.domain.entity.Member;
 import com.postdm.backend.domain.member.domain.entity.MemberRole;
@@ -10,17 +9,14 @@ import com.postdm.backend.global.jwt.dto.TokenInfo;
 import com.postdm.backend.global.jwt.util.JwtProvider;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -57,7 +53,6 @@ class LogoutIntegrationTest {
         String rawPassword = "testpassword1!";
         String encodedPassword = passwordEncoder.encode(rawPassword);
 
-        // 테스트용 사용자 등록
         Member member = Member.builder()
                 .username("홍길동")
                 .password(encodedPassword)

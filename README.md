@@ -3,17 +3,17 @@
 ### **1. 개요**
 - **프로젝트 배경**: PC 기반의 포스트디엠 서비스를 스마트폰에서도 접근 가능하도록 웹모바일 버전으로 확장 및 UI/UX 개선 필요
 - **목표**: 웹모바일 버전을 통해 스마트폰 환경에서 손쉬운 접근성과 사용 편의성 제공
-- **개발 기간**: 2025.01.30 ~
+- **개발 기간**: 2025.02.10 ~
 - **핵심 기능**
     - 견적서 작성 및 나의 견적서 목록 확인
     - 관리자 페이지에서 모든 사용자의 견적서 확인 및 관리 기능
 
 ### 2. 팀원 및 역할
-#### Frontend
+#### 📌Frontend
 - [hardlife0](https://github.com/hardlife0)
 - [Daeun Lee](https://github.com/LEE-DA-EUN)
 
-#### Backend
+#### 📌Backend
 - [Jiyoung Oh](https://github.com/rimeir)
 - [SungMin Lee](https://github.com/Etwashoeren)
 
@@ -30,5 +30,5 @@
 - 관리자 전용 전체 사용자 견적서 목록 확인 및 견적서 확인 표시 기능
 - **보안**
     - JWT 기반 인증
-    - 민감 정보 암호화 저장(비밀번호 해싱)
+    - 민감 정보 암호화 저장
     - HTTPS 통신 적용

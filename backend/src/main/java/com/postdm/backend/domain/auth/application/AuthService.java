@@ -9,6 +9,7 @@ import com.postdm.backend.domain.email.domain.repository.CertificationRepository
 import com.postdm.backend.domain.member.domain.entity.Member;
 import com.postdm.backend.domain.member.domain.entity.MemberRole;
 import com.postdm.backend.domain.member.domain.repository.MemberRepository;
+import com.postdm.backend.domain.member.dto.MemberPrincipalDto;
 import com.postdm.backend.global.common.exception.CustomException;
 import com.postdm.backend.global.common.response.ErrorCode;
 import com.postdm.backend.global.jwt.dto.TokenInfo;
@@ -18,6 +19,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -164,8 +166,12 @@ public class AuthService { // 로그인 및 회원가입 서비스
             throw new CustomException(ErrorCode.ALREADY_SIGN_OUT);
         }
 
-        Authentication authentication = jwtProvider.getAuthentication(accessToken);
-        Member member = (Member) authentication.getPrincipal();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        MemberPrincipalDto principal = (MemberPrincipalDto) authentication.getPrincipal();
+
+        Long memberId = principal.getId();
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(ErrorCode.AUTHORIZED_MEMBER_NOT_FOUND));
         String username = member.getUsername();
 
         // Refresh Token 삭제
@@ -179,8 +185,8 @@ public class AuthService { // 로그인 및 회원가입 서비스
         }
 
         Authentication authentication = jwtProvider.getAuthentication(oldRefreshToken);
-        Member member = (Member) authentication.getPrincipal();
-        String username = member.getUsername();
+        MemberPrincipalDto principal = (MemberPrincipalDto) authentication.getPrincipal();
+        String username = principal.getUsername();
 
         RefreshToken saved = refreshTokenRepository.findById(username)
                 .orElseThrow(() -> new CustomException(ErrorCode.REFRESH_TOKEN_NOT_FOUND));

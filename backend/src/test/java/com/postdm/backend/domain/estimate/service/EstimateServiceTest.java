@@ -7,6 +7,9 @@ import com.postdm.backend.domain.estimate.entity.EstimateRepository;
 import com.postdm.backend.domain.member.domain.entity.Member;
 import com.postdm.backend.domain.member.domain.entity.MemberRole;
 import com.postdm.backend.domain.member.domain.repository.MemberRepository;
+import com.postdm.backend.domain.member.dto.MemberPrincipalDto;
+import com.postdm.backend.domain.member.dto.TestPrincipalFactory;
+import com.postdm.backend.global.common.exception.CustomException;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -66,13 +69,14 @@ class EstimateServiceTest {
     @Test
     @DisplayName("견적서를 생성하면 정상적으로 반환해야 한다")
     void 견적서를_생성하면_정상적으로_반환() {
-        // Given
+        // given
         EstimateRequestDto requestDto = new EstimateRequestDto("새로운 견적서 내용입니다.");
+        MemberPrincipalDto principal = TestPrincipalFactory.create(testMember);
 
-        // When
-        EstimateResponseDto responseDto = estimateService.createEstimate(requestDto.getContent(), testMember);
+        // when
+        EstimateResponseDto responseDto = estimateService.createEstimate(requestDto.getContent(), principal);
 
-        // Then
+        // then
         assertThat(responseDto).isNotNull();
         assertThat(responseDto.getContent()).isEqualTo("새로운 견적서 내용입니다.");
         assertThat(responseDto.getMemberId()).isEqualTo(testMember.getId());
@@ -82,19 +86,23 @@ class EstimateServiceTest {
     @DisplayName("비어 있는 내용으로 견적서를 생성하면 예외가 발생해야 한다")
     void 비어있는_내용으로_견적서를_생성하면_예외가_발생() {
         EstimateRequestDto requestDto = new EstimateRequestDto("");
+        MemberPrincipalDto principal = TestPrincipalFactory.create(testMember);
 
         assertThrows(RuntimeException.class, () -> {
-            estimateService.createEstimate(requestDto.getContent(), testMember);
+            estimateService.createEstimate(requestDto.getContent(), principal);
         });
     }
 
     @Test
     @DisplayName("사용자가 본인의 견적서를 조회할 수 있다")
     void 사용자가_본인의_견적서를_조회() {
-        // When
-        List<EstimateResponseDto> estimates = estimateService.getEstimates(testMember);
+        // given
+        MemberPrincipalDto principal = TestPrincipalFactory.create(testMember);
 
-        // Then
+        // when
+        List<EstimateResponseDto> estimates = estimateService.getEstimates(principal);
+
+        // then
         assertThat(estimates).isNotEmpty();
         assertThat(estimates.get(0).getContent()).isEqualTo(testEstimate.getContent());
         assertThat(estimates.get(0).getMemberId()).isEqualTo(testMember.getId());
@@ -116,8 +124,11 @@ class EstimateServiceTest {
     @Test
     @DisplayName("일반 사용자가 본인의 견적서를 상세 조회할 수 있다")
     void 일반_사용자는_자신의_견적서_상세_조회_가능() {
+        // given
+        MemberPrincipalDto principal = TestPrincipalFactory.create(testMember);
+
         // when
-        EstimateResponseDto response = estimateService.getEstimateDetail(testEstimate.getId(), testMember);
+        EstimateResponseDto response = estimateService.getEstimateDetail(testEstimate.getId(), principal);
 
         // then
         assertThat(response).isNotNull();
@@ -132,9 +143,11 @@ class EstimateServiceTest {
         Member otherUser = new Member(0L, "otherUser", "nickname2", "pass", "other@ex.com", "01012345678", MemberRole.MEMBER);
         memberRepository.saveAndFlush(otherUser);
 
+        MemberPrincipalDto otherPrincipal = TestPrincipalFactory.create(otherUser);
+
         // when & then
-        assertThrows(RuntimeException.class, () -> {
-            estimateService.getEstimateDetail(testEstimate.getId(), otherUser);
+        assertThrows(CustomException.class, () -> {
+            estimateService.getEstimateDetail(testEstimate.getId(), otherPrincipal);
         });
     }
 
@@ -144,9 +157,10 @@ class EstimateServiceTest {
         // given
         Member admin = new Member(0L, "admin", "관리자", "adminpass", "admin@ex.com", "01000000000", MemberRole.ADMIN);
         memberRepository.saveAndFlush(admin);
+        MemberPrincipalDto principal = TestPrincipalFactory.create(testMember);
 
         // when
-        EstimateResponseDto response = estimateService.getEstimateDetail(testEstimate.getId(), admin);
+        EstimateResponseDto response = estimateService.getEstimateDetail(testEstimate.getId(), principal);
 
         // then
         assertThat(response).isNotNull();

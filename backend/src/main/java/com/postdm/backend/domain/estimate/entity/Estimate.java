@@ -2,6 +2,7 @@ package com.postdm.backend.domain.estimate.entity;
 
 import com.postdm.backend.domain.member.domain.entity.Member;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -25,6 +26,7 @@ public class Estimate {
 
     private LocalDateTime createdAt;
 
+    @Builder
     public Estimate(String content, Member member) {
         this.title = generateTitle(content);
         this.content = content;

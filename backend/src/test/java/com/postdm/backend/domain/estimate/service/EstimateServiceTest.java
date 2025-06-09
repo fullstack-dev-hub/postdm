@@ -18,14 +18,18 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 
+
+import org.springframework.data.domain.Pageable;
 import java.util.Collections;
-import java.util.List;
+
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -93,30 +97,35 @@ class EstimateServiceTest {
         });
     }
 
+
     @Test
-    @DisplayName("사용자가 본인의 견적서를 조회할 수 있다")
-    void 사용자가_본인의_견적서를_조회() {
+    @DisplayName("사용자가 본인의 견적서를 페이지네이션해서 조회할 수 있다")
+    void 사용자는_자신의_견적서만_페이지네이션해서_조회() {
         // given
         MemberPrincipalDto principal = TestPrincipalFactory.create(testMember);
+        Pageable pageable = PageRequest.of(0, 2);
 
         // when
-        List<EstimateResponseDto> estimates = estimateService.getEstimates(principal);
+        Page<EstimateResponseDto> result = estimateService.getEstimates(principal, pageable);
 
         // then
-        assertThat(estimates).isNotEmpty();
-        assertThat(estimates.get(0).getContent()).isEqualTo(testEstimate.getContent());
-        assertThat(estimates.get(0).getMemberId()).isEqualTo(testMember.getId());
+        assertThat(result.getContent()).hasSize(1);
+        assertThat(result.getTotalElements()).isEqualTo(1);
     }
 
     @Test
     @DisplayName("인증되지 않은 사용자가 견적서를 조회하면 예외가 발생해야 한다")
     void 인증되지_않은_사용자가_견적서를_조회하면_예외_발생() {
+        // given
         SecurityContextHolder.clearContext();
+        Pageable pageable = PageRequest.of(0, 2);
 
+        // when
         Exception exception = assertThrows(Exception.class, () -> {
-            estimateService.getEstimates(null);
+            estimateService.getEstimates(null, pageable);
         });
 
+        // then
         System.out.println("예외 클래스: " + exception.getClass().getName());
         System.out.println("예외 메시지: " + exception.getMessage());
     }

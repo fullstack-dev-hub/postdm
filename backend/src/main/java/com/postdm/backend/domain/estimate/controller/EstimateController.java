@@ -2,6 +2,7 @@ package com.postdm.backend.domain.estimate.controller;
 
 import com.postdm.backend.domain.estimate.dto.EstimateRequestDto;
 import com.postdm.backend.domain.estimate.dto.EstimateResponseDto;
+import com.postdm.backend.domain.estimate.dto.PageResponse;
 import com.postdm.backend.domain.estimate.service.EstimateService;
 import com.postdm.backend.domain.member.dto.MemberPrincipalDto;
 import com.postdm.backend.global.template.ResponseTemplate;
@@ -44,10 +45,11 @@ public class EstimateController {
 
     @Operation(summary = "견적서 조회", description = "관리자는 모든 견적서를, 사용자는 본인의 견적서만 조회합니다.")
     @GetMapping
-    public ResponseEntity<ResponseTemplate<Page<EstimateResponseDto>>> getEstimates(
+    public ResponseEntity<ResponseTemplate<PageResponse<EstimateResponseDto>>> getEstimates(
             @AuthenticationPrincipal MemberPrincipalDto currentUser,
             @PageableDefault(page = 0, size = 6, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
-        Page<EstimateResponseDto> response = estimateService.getEstimates(currentUser, pageable);
+        Page<EstimateResponseDto> page = estimateService.getEstimates(currentUser, pageable);
+        PageResponse<EstimateResponseDto> response = new PageResponse<>(page);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(new ResponseTemplate<>(HttpStatus.OK, "견적서 조회 성공", response));

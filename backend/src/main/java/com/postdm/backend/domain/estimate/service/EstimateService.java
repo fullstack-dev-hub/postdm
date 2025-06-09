@@ -13,14 +13,16 @@ import com.postdm.backend.global.common.exception.CustomException;
 import com.postdm.backend.global.common.response.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import org.springframework.data.domain.Pageable;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class EstimateService {
     private final EstimateRepository estimateRepository;
     private final MemberRepository memberRepository;
@@ -46,18 +48,14 @@ public class EstimateService {
         );
     }
 
-    public List<EstimateResponseDto> getEstimates(MemberPrincipalDto principal) {
+    public Page<EstimateResponseDto> getEstimates(MemberPrincipalDto principal, Pageable pageable) {
         Member member = findMemberOrThrow(principal.getId());
 
-        List<Estimate> estimates = (member.getRole() == MemberRole.ADMIN)
-                ? adminPolicy.getEstimates(member, estimateRepository)
-                : userPolicy.getEstimates(member, estimateRepository);
+        Page<Estimate> page = (member.getRole() == MemberRole.ADMIN)
+                ? adminPolicy.getEstimates(member, estimateRepository, pageable)
+                : userPolicy.getEstimates(member, estimateRepository, pageable);
 
-        return estimates.stream()
-                .map(e -> new EstimateResponseDto(
-                        e.getId(), e.getTitle(), e.getContent(), e.getCreatedAt(), e.getMember().getId()
-                ))
-                .collect(Collectors.toList());
+        return page.map(EstimateResponseDto::from);
     }
 
     public EstimateResponseDto getEstimateDetail(Long estimateId, MemberPrincipalDto principal) {

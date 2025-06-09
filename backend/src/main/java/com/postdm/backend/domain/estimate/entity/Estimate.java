@@ -49,6 +49,6 @@ public class Estimate {
     }
 
     private String generateTitle(String content) {
-        return content.length() > 10 ? content.substring(0, 10) + "..." : content;
+        return content.length() > 10 ? content.substring(0, 10) + "****" : content;
     }
 }

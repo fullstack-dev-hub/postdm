@@ -1,5 +1,6 @@
 package com.postdm.backend.domain.estimate.service;
 
+import com.postdm.backend.domain.estimate.dto.EstimateListResponseDto;
 import com.postdm.backend.domain.estimate.dto.EstimateResponseDto;
 import com.postdm.backend.domain.estimate.entity.Estimate;
 import com.postdm.backend.domain.estimate.entity.EstimateRepository;
@@ -48,14 +49,14 @@ public class EstimateService {
         );
     }
 
-    public Page<EstimateResponseDto> getEstimates(MemberPrincipalDto principal, Pageable pageable) {
+    public Page<EstimateListResponseDto> getEstimates(MemberPrincipalDto principal, Pageable pageable) {
         Member member = findMemberOrThrow(principal.getId());
 
         Page<Estimate> page = (member.getRole() == MemberRole.ADMIN)
                 ? adminPolicy.getEstimates(member, estimateRepository, pageable)
                 : userPolicy.getEstimates(member, estimateRepository, pageable);
 
-        return page.map(EstimateResponseDto::from);
+        return page.map(EstimateListResponseDto::from);
     }
 
     public EstimateResponseDto getEstimateDetail(Long estimateId, MemberPrincipalDto principal) {

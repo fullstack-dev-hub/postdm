@@ -3,14 +3,17 @@ package com.postdm.backend.domain.estimate.service.policy;
 import com.postdm.backend.domain.estimate.entity.Estimate;
 import com.postdm.backend.domain.estimate.entity.EstimateRepository;
 import com.postdm.backend.domain.member.domain.entity.Member;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
+import org.springframework.data.domain.Pageable;
 
 @Component
+@RequiredArgsConstructor
 public class UserEstimatePolicy implements EstimatePolicy {
     @Override
-    public List<Estimate> getEstimates(Member member, EstimateRepository repository) {
-        return repository.findByMemberId(member.getId()); // 일반 유저: 본인만 조회
+    public Page<Estimate> getEstimates(Member member, EstimateRepository repository, Pageable pageable) {
+        return repository.findByMember(member, pageable);
     }
 }

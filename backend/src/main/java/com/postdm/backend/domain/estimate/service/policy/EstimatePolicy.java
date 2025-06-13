@@ -3,9 +3,10 @@ package com.postdm.backend.domain.estimate.service.policy;
 import com.postdm.backend.domain.estimate.entity.Estimate;
 import com.postdm.backend.domain.estimate.entity.EstimateRepository;
 import com.postdm.backend.domain.member.domain.entity.Member;
+import org.springframework.data.domain.Page;
 
-import java.util.List;
+import org.springframework.data.domain.Pageable;
 
 public interface EstimatePolicy {
-    List<Estimate> getEstimates(Member member, EstimateRepository repository);
+    Page<Estimate> getEstimates(Member member, EstimateRepository repository, Pageable pageable);
 }

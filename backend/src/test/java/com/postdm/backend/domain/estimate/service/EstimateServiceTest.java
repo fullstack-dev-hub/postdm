@@ -1,5 +1,6 @@
 package com.postdm.backend.domain.estimate.service;
 
+import com.postdm.backend.domain.estimate.dto.EstimateListResponseDto;
 import com.postdm.backend.domain.estimate.dto.EstimateRequestDto;
 import com.postdm.backend.domain.estimate.dto.EstimateResponseDto;
 import com.postdm.backend.domain.estimate.entity.Estimate;
@@ -106,7 +107,7 @@ class EstimateServiceTest {
         Pageable pageable = PageRequest.of(0, 2);
 
         // when
-        Page<EstimateResponseDto> result = estimateService.getEstimates(principal, pageable);
+        Page<EstimateListResponseDto> result = estimateService.getEstimates(principal, pageable);
 
         // then
         assertThat(result.getContent()).hasSize(1);

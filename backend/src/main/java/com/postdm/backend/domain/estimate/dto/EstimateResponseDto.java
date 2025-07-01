@@ -1,15 +1,19 @@
 package com.postdm.backend.domain.estimate.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.postdm.backend.domain.estimate.entity.Estimate;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Schema(description = "견적서 응답 DTO")
 @AllArgsConstructor
+@NoArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class EstimateResponseDto {
 
     @Schema(description = "견적서 ID", example = "1")

@@ -1,8 +1,12 @@
 spring:
   application:
     name: backend
+  cache:
+    cache-names: estimates
+    redis:
+      enable-statistics: true
   profiles:
-    active: ${SPRING_PROFILES_ACTIVE:prod} # 로컬 테스트 시, dev로 변경
+    active: ${SPRING_PROFILES_ACTIVE:dev} # 로컬 테스트 시, dev로 변경
     
 # Swagger 설정
 springdoc:
@@ -20,8 +24,3 @@ springdoc:
     disabled: true
 
   override-with-generic-response: false
-
-management:
-  endpoint:
-    health:
-      show-details: when_authorized

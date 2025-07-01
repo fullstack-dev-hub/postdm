@@ -12,6 +12,7 @@ import com.postdm.backend.domain.member.domain.repository.MemberRepository;
 import com.postdm.backend.domain.member.dto.MemberPrincipalDto;
 import com.postdm.backend.global.common.exception.CustomException;
 import com.postdm.backend.global.common.response.ErrorCode;
+import org.springframework.cache.annotation.Cacheable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -59,7 +60,9 @@ public class EstimateService {
         return page.map(EstimateListResponseDto::from);
     }
 
+    @Cacheable(value = "estimates", key = "#estimateId")
     public EstimateResponseDto getEstimateDetail(Long estimateId, MemberPrincipalDto principal) {
+        log.info("DB에서 조회 수행 - estimateId={}", estimateId);
         Member member = findMemberOrThrow(principal.getId());
 
         Estimate estimate = estimateRepository.findById(estimateId)

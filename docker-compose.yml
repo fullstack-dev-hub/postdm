@@ -38,5 +38,11 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql # 데이터를 Docker Volume에 저장
 
+  redis:
+    image: redis:7.0
+    container_name: redis
+    ports:
+      - "6379:6379"
+
 volumes:
   mysql_data:  # 데이터 영구 저장 Docker Volume

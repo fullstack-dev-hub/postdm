@@ -13,6 +13,8 @@ import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Optional;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -23,6 +25,12 @@ public class DummyDataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
+        Optional<Member> userOptional = memberRepository.findById(1L);
+        if (userOptional.isEmpty()) {
+            log.warn("ID가 1인 유저가 존재하지 않습니다. 더미 데이터 생성을 건너뜁니다.");
+            return;
+        }
+
         if (estimateRepository.count() > 0) {
             log.info("[INIT] 이미 견적서 데이터가 존재합니다. 초기화를 건너뜁니다.");
             return;
